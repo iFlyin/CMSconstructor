@@ -9,7 +9,7 @@ export default {
       panel: {
          left: 0,
          right: 0,
-         footer: 0,
+         // footer: 0,
       },
       systems_list: [
          {
@@ -18,7 +18,7 @@ export default {
          },
          {
             uuid: 'b8a99645-0bd6-4052-a0f8-aaf612328274',
-            name: '"СИСЗЛ"',
+            name: 'СИСЗЛ',
          },
          {
             uuid: 'fe0b9fbc-0b8b-4a3a-96ee-332ae84b5fa8',
@@ -50,6 +50,7 @@ export default {
          10: 'Статичная страница',
          21: 'Экран дерево-поля ',
          22: 'Экран поиска документа',
+         24: 'Внутренний фрэйм',
          27: 'Экран просмотра документа',
       },
       prop_type: {
@@ -190,9 +191,9 @@ export default {
          // const offsetX = (mouseX / realWidth) * 100;
          // const offsetY = (mouseY / realHeight) * 100;
 
-         if (event.deltaY > 0) { 
+         if (event.deltaY > 0) {
             if (clearZoom === 3) {
-               state.zoom = 0.3
+               state.zoom = 0.3;
             } else {
                state.zoom -= 0.1;
             }
@@ -221,7 +222,8 @@ export default {
          state.screenList.push(payload);
       },
       add2cmsList(state: any, payload: any): void {
-          state.cmsList.push(payload);
+         state.cmsList.push(payload.item);
+         payload.callback();
       },
       delFromScreenList(state: any, payload: any): void {
          state.screenList.splice(payload, 1);
@@ -255,16 +257,15 @@ export default {
          const CMSpath = state.cmsList[CMSindex];
          CMSpath.props.effect = payload.v;
          const parentID = CMSpath.props.parent_id;
-         const fixParentID = (parentID) ? parentID : -1; 
+         const fixParentID = (parentID) ? parentID : -1;
          const parentIndex = state.screenList.findIndex((el: any) => el.props.id === fixParentID);
          const parentPath = state.screenList[parentIndex];
-         
          const parent = {
             X: parentPath.params.X,
             Y: parentPath.params.Y,
             W: parentPath.params.width,
             H: parentPath.params.height,
-         }
+         };
 
          const CMS = {
             X: CMSpath.params.X + parent.X,
@@ -276,16 +277,16 @@ export default {
          const CMScenter = {
             X: CMS.X + (CMS.W /2),
             Y: CMS.Y + (CMS.H /2),
-         }
-         
+         };
+
          const path1 = rectConstructor(parent.X, parent.Y, parent.W, parent.H);
          const path2 = lineConstructor(CMScenter.X, CMScenter.Y, CMScenter.X, CMScenter.Y + 10000);
 
          let X = ((CMScenter.X - 200) > 0) ? (CMScenter.X - 200) : 0;
          let Y = intersect(path1, path2)[0].y + 100;
-         
          const effect = CMSpath.props.effect;
          const check = state.effect2screen.hasOwnProperty(effect);
+         // добавить луки и add params!!!
 
          const childIndex = state.screenList.findIndex((el: any) => el.props.id === payload.id);
 
@@ -294,17 +295,17 @@ export default {
             Y = state.screenList[childIndex].params.Y;
             clear(payload.id);
          }
-         
+
          if (check) {
             const newScreen = {
-               props: { 
+               props: {
                   id: payload.id,
                   name: state.effect2screen[effect],
                },
                params: {
                   type: 'Screen',
-                  X: X,
-                  Y: Y,
+                  X,
+                  Y,
                   width: 400,
                   height: 320,
                },
@@ -312,12 +313,14 @@ export default {
             state.screenList.push(newScreen);
          }
 
+         if (payload.callback) { payload.callback(); }
+
          function rectConstructor(x: number, y: number, w: number, h: number): string {
             return `M${x},${y}L${x + w},${y}L${x + w},${y + h}L${x},${y + h}Z`;
          }
 
          function lineConstructor(x1: number, y1: number, x2: number, y2: number): string {
-            return `M${x1},${y1}L${x2},${y2}`
+            return `M${x1},${y1}L${x2},${y2}`;
          }
 
          function clear (id: any) {
@@ -347,6 +350,7 @@ export default {
          const index = state.cmsList.findIndex((cms: any) => cms.props.id == payload.id);
          const cms = state.cmsList[index];
          cms.props[key] = value;
+         payload.callback();
       },
       initNewProject(state: any) {
          state.init = true;
@@ -394,7 +398,37 @@ export default {
             }
          })(null);
          // console.log(state.cmsList)
-      }
+      },
+      saveToFile(state: any, payload: any) {
+         console.log(payload);
+         const json = {
+            cms: state.cmsList,
+            screen: state.screenList,
+         };
+         const el = payload;
+         const filename = 'obj.json';
+         const blob = new Blob([JSON.stringify(json)], { type: 'application/json' });
+         el.setAttribute('href', window.URL.createObjectURL(blob));
+         el.setAttribute('download', filename);
+         el.dataset.downloadurl = ['application/json', filename, window.URL.createObjectURL(blob)].join(':');
+      },
+      loadFromFile(state: any, payload: any) {
+         const file = payload.file.target.files[0];
+         const reader = new FileReader();
+         reader.onload = (e: any) => {
+            const json = JSON.parse(e.target.result);
+            state.cmsList = json.cms;
+            state.screenList = json.screen;
+            payload.callback();
+         };
+         reader.readAsText(file);
+      },
+      saveToService(state: any) {
+         for (const CMS of state.cmsList) {
+            const obj = JSON.stringify(CMS.props);
+            console.log(obj);
+         }
+      },
    },
    actions: {
       asyncGetLook: async (context: any) => {
@@ -428,8 +462,8 @@ export default {
                   return console.log("ошибка ID не могут быть равными")
                }
             })
-            const length = sortById.length
-            const lastID = sortById[length-1].id;
+            const length = sortById.length;
+            const lastID = sortById[length - 1].id;
             context.commit('setID', lastID);
          } catch (err) {
             console.log(err);
@@ -437,9 +471,10 @@ export default {
       },
       asyncGetCMSbyId: async (context: any, payload: any) => {
          try {
+            const id = payload.id;
             context.commit('clearAll');
-            const resp: any = await http.get(`/get/get_cms?systems_id=${payload}`);
-            context.commit('setSystemId', payload);
+            const resp: any = await http.get(`/get/get_cms?systems_id=${id}`);
+            context.commit('setSystemId', id);
             context.commit('initNewProject');
             context.commit('panelResize', {dir: 'left', val: 240});
             context.commit('panelResize', {dir: 'right', val: 240});
@@ -449,8 +484,10 @@ export default {
                context.commit('setCMSeffect', {
                   v: obj.props.effect,
                   id: obj.props.id,
-               })
+               });
             }
+            payload.callback();
+            // clear();
             // console.log(data);
          } catch (err) {
             console.log(err);
