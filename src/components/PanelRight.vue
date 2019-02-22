@@ -6,7 +6,6 @@
          height: height + 'px',
       }"
    >
-      
       <div 
          class="ew-resize"
          :style="{ right: (width - 5) + 'px' }"
@@ -37,10 +36,12 @@ import cmsForm from './CMSForm.vue';
 })
 export default class RightAsidePanel extends Vue {
    public width!: number;
+   public height!: number;
 
    public resize(this: any): void {
       const that: any = this;
       const maxWidth: number = this.$el.parentNode.clientWidth;
+      console.log(this.height);
 
       function move(this: any, e: MouseEvent): void {
          const innerWidth = this.innerWidth;
@@ -74,9 +75,10 @@ export default class RightAsidePanel extends Vue {
    #panel-right {
       position: relative;
       background-color: #fff;
-      overflow: hidden;
-      border-left: 1px solid #2c3e50;
+      overflow: auto;
+      // border-left: 1px solid #2c3e50;
       box-sizing: border-box;
+      // height: 100%;
    }
 
    .ew-resize {

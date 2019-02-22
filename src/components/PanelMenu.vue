@@ -110,7 +110,9 @@ export default class MainMenu extends Vue {
    public panelToogle(this: any, dir: string) {
       this.panelResize({
          dir: dir,
-         val: this[dir] ? 2 : 240,
+         val: this[dir] ? 2 : dir === 'left'
+            ? 280 
+            : 320,
       })
    }
 
@@ -156,7 +158,7 @@ export default class MainMenu extends Vue {
       width: 100%;
       height: 30px;
       background-color: #2c3e50;
-      padding: 0 20px;
+      padding: 0 10px;
       z-index: 1000000;
 
       & nav {

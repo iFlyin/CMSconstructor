@@ -54,6 +54,10 @@ export default {
          27: 'Экран просмотра документа',
       },
       prop_type: {
+         look: {
+            desc: 'Как нарисовать элемент на экране',
+            type: 'el-readonly',
+         },
          systems_id: {
             desc: 'Cистема (подсистема), в которой используется данный раздел/СЭМД', 
             type: 'el-readonly',
@@ -65,6 +69,10 @@ export default {
          parent_id: {
             desc: 'Код родительского элемента веб-приложения',
             type: 'el-readonly',
+         },
+         group_number: {
+            desc: 'Порядковый номер элемента внутри группы с заданным parent_id',
+            type: 'el-input-number',
          },
          name: {
             desc: 'Экранное краткое наименование элемента при прорисовке веб-интерфейса',
@@ -78,23 +86,15 @@ export default {
             desc: 'Описание элемента',
             type: 'el-textarea',
          },
-         look: {
-            desc: 'Как нарисовать элемент на экране',
-            type: 'el-readonly'
-         },
          effect: {
             desc: 'Что делать по инициации элемента',
             type: 'el-select',
          },
          add_params: {
             desc: 'Дополнительные параметры прорисовки веб-приложения',
-            type: 'el-textarea'
+            type: 'el-textarea',
          },
-         group_number: {
-            desc: 'Порядковый номер элемента внутри группы с заданным parent_id',
-            type: 'el-input-number'
-         },
-         d_start: { 
+         d_start: {
             desc: 'Дата создания записи в РИИСЗ',
             type: 'el-datepicker',
          },

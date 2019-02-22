@@ -4,7 +4,7 @@
     <div id="nav">
       <router-link class="disabledLink" to="/">Документы</router-link> |
       <router-link class="disabledLink" to="/">Формы</router-link> |
-      <router-link to="/bl_designer">Процессы</router-link>
+      <router-link to="/CMS">Процессы</router-link>
     </div>
   </div>
 </template>

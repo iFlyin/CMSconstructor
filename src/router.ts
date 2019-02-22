@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
+import CMS from './views/CMS.vue';
 
 Vue.use(Router);
 
@@ -14,9 +15,9 @@ export default new Router({
       component: Home,
     },
     {
-      path: '/bl_designer',
-      name: 'bl_designer',
-      component: () => import('./views/BLDesigner.vue'),
+      path: '/CMS',
+      name: 'CMS',
+      component: CMS,
     },
     {
       path: '/default',

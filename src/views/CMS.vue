@@ -13,7 +13,7 @@
         },
       ]"/>
     </panel-left>
-    <div class="flex-column">
+    <!-- <div class="flex-column"> -->
       <div class="flex-row">
         <app-canvas :width="canvasWidth" :height="canvasHeight">
           <layout-b-l :left="panel.left"/>
@@ -21,7 +21,7 @@
         <panel-right :width="panel.right" :height="canvasHeight" @resize="panelResize({dir: 'right', val: $event})" v-if="init"/> 
       </div>
       <!-- <panel-footer :height="panel.right" :width="canvasWidth + panel.right" @resize="panelResize({dir: 'footer', val: $event})"/> -->
-    </div>
+    <!-- </div> -->
   </div>
 </template>
 
@@ -58,7 +58,7 @@ import LayoutBL from '@/components/CMSLayout.vue';
   },
 })
 
-export default class UMLDesigner extends Vue {
+export default class CMS extends Vue {
   public panel!: any;
   private windowWidth: number = window.innerWidth;
   private windowHeight: number = window.innerHeight;
@@ -102,15 +102,15 @@ export default class UMLDesigner extends Vue {
   }
 
   private get canvasHeight(): number {
-    return this.windowHeight - this.panel.footer - 30;
+    return this.windowHeight - 30 //- this.panel.footer;
   }
 
   public initialize() {
     const init = () => {
       this.addFirstScreen();
       this.asyncGetID();
-      this.panelResize({dir: 'left', val: 240});
-      this.panelResize({dir: 'right', val: 240});
+      this.panelResize({dir: 'left', val: 250});
+      this.panelResize({dir: 'right', val: 320});
     }
     if (!this.init) {
       init();

@@ -5,12 +5,17 @@
          v-html="label + ': '"
          :style="{'width': labelWidth + 'px'}"
       />
-      <components class="input" :is="component" :val="value" @change="setValue({
-         id: cms.props.id,
-         key: label,
-         v: $event,
-         callback: saveSnapshot
-      })"/>
+      <components 
+         :is="component"
+         :val="value"
+         class="input"
+         @change="setValue({
+            id: cms.props.id,
+            key: label,
+            v: $event,
+            callback: saveSnapshot
+         })"
+      />
    </div>
 </template>
 
@@ -84,8 +89,8 @@ export default class InputView extends Vue {
       align-items: center;
       box-sizing: border-box;
       padding: 5px 20px;
-      border-bottom: 1px solid grey;
-      margin: 5px;
+      border-top: 1px solid grey;
+      margin: 0 5px;
    }
 
    .input-label {

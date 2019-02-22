@@ -54,7 +54,8 @@ export default class CMSForm extends Vue {
       padding: 5px;
       width: 100%;
       height: 100%;
-      // background-color: red;
+      background-color: #2c3e50;
+      color: #fff;
       overflow-x: hidden;
       overflow-y: auto;
       // display: flex;
