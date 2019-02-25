@@ -133,14 +133,14 @@ export default class LayoutBL extends Vue {
 
 <style lang="scss" scoped>
    .layout {
-      min-width: 100%;
-      min-height: 100%;
-      display: flex;
-      z-index: 1;
-      position: relative;
-      outline: none;
-      overflow: auto;
-   }
+        min-width: 100%;
+        min-height: 100%;
+         display: flex;
+        z-index: 1;
+        position: relative;
+        outline: none;
+         overflow: auto;
+    }
 
    .line-container {
       top: 0;
@@ -148,6 +148,5 @@ export default class LayoutBL extends Vue {
       position: absolute;
       width: 100%;
       height: 100%;
-      background-color: green;
    }
 </style>

@@ -20,7 +20,7 @@
             <screen-resize v-if="isSelected" :zoom="zoom" @resize="resize($event)"/>
             <div class="layout-item-content">
                <div class="layout-item-header" @drop.stop @mousedown.stop="movement($event)" :style="{
-                  background: isSelected ? '#009688' : '#2c3e50'
+                  background: isSelected ? colorGreen : colorDark
                }">
                   <!-- вынести в getter!!! -->
                   {{ (item.props.id &lt; 0) ? -(item.props.id) : '' }} {{item.props.name || 'Пустой экран'}}
@@ -58,14 +58,14 @@
             <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="0" refY="3.5" orient="auto">
               <polygon 
                   :points="`0 0, ${10 * zoom} 3.5, 0 7`"
-                  fill="#009688"
+                  :fill="colorGreen"
               />
             </marker>
          </defs>
          <path
             v-for="(line, index) of lines" :key="index"
             :d="line"
-            :stroke="isSelected ? '#009688' : '#2c3e50'"
+            :stroke="colorDark"
             :stroke-width="1.2 / zoom"
             marker-end="url(#arrowhead)"
          />
@@ -76,7 +76,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { mapGetters, mapMutations } from 'vuex';
-import { snapshot } from '@/mixins';
+import { snapshot, colors } from '@/mixins';
 import CmsElement from './CMSElement.vue';
 import intersect from 'path-intersection';
 import ScreenResize from './CMSResize.vue';
@@ -84,7 +84,7 @@ import ScreenResize from './CMSResize.vue';
 @Component({
     components: {CmsElement, ScreenResize},
     props: { item: { type: Object, required: true } },
-    mixins: [ snapshot ],
+    mixins: [ snapshot, colors ],
     computed: {
         ...mapGetters('CMS', {
             id: 'getID',
@@ -345,7 +345,7 @@ export default class CMSScreen extends Vue {
 <style lang="scss" scoped>
    .layout-item {
       border-style: solid;
-      border-color: #2c3e50;
+      border-color: $colorDark;
       box-sizing: border-box;
       z-index: 1001;
       position: absolute;
@@ -371,13 +371,12 @@ export default class CMSScreen extends Vue {
          padding: 10px;
          width: 100%;
          box-sizing: border-box;
-         // border-bottom: 1px solid #2c3e50;
          display: flex;
          justify-content: center;
          align-items: center;
          user-select: none;
          cursor: move;
-         background-color: #2c3e50;
+         background-color: $colorDark;
          color: #fff;
       }
 

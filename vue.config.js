@@ -7,7 +7,12 @@ module.exports = {
     ? '/constructor/'
     : '/',
   css: {
-    extract: false
+    extract: false,
+    loaderOptions: {
+      sass: {
+        data: `@import "@/styles/var.scss";`
+      }
+    }
   },
   productionSourceMap: false
 }

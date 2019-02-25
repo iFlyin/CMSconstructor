@@ -1,6 +1,6 @@
 <template>
   <div id="constructor">
-    <main-menu @newproject="initialize()" @initByID="asyncGetCMSbyId({
+    <main-menu @newproject="initialize($event)" @initByID="asyncGetCMSbyId({
       id: $event,
       callback: clearHistory,
     })"/>
@@ -49,11 +49,12 @@ import LayoutBL from '@/components/CMSLayout.vue';
     }),
   },
   methods: { 
-    ...mapActions('CMS', ['asyncGetLook', 'asyncGetEffect', 'asyncGetCMSbyId', 'asyncGetID']), 
+    ...mapActions('CMS', ['asyncGetLook', 'asyncGetEffect', 'asyncGetCMSbyId', 'asyncGetID', 'asyncGetImages']), 
     ...mapMutations('CMS', {
       addFirstScreen: 'initNewProject', 
       clearAll: 'clearAll',
       panelResize: 'panelResize',
+      setSystemId: 'setSystemId',
     }),
   },
 })
@@ -76,9 +77,11 @@ export default class CMS extends Vue {
   private panelResize!: any;
   private clearHistory!: any;
   private saveSnapshot!: any;
+  private setSystemId!: any;
 
   private get components(): any[] {
     const newArr: any[] = new Array();
+    // console.log(this.weblook);
     for (const item of this.weblook) {
       const newItem = {
         params: {
@@ -105,8 +108,9 @@ export default class CMS extends Vue {
     return this.windowHeight - 30 //- this.panel.footer;
   }
 
-  public initialize() {
+  public initialize(e: string) {
     const init = () => {
+      this.setSystemId(e);
       this.addFirstScreen();
       this.asyncGetID();
       this.panelResize({dir: 'left', val: 250});
@@ -132,6 +136,7 @@ export default class CMS extends Vue {
   private created(): void {
     this.asyncGetLook();
     this.asyncGetEffect();
+    // this.asyncGetImages();
   }
 }
 </script>
@@ -146,9 +151,6 @@ export default class CMS extends Vue {
   }
 
   .flex {
-    // &-element {
-    //   // flex: 1 1 auto;
-    // }
 
     &-column {
       display: flex;

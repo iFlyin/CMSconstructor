@@ -2,6 +2,7 @@ import Vue from 'vue';
 import Router from 'vue-router';
 import Home from './views/Home.vue';
 import CMS from './views/CMS.vue';
+import SEMD from './views/SEMD.vue';
 
 Vue.use(Router);
 
@@ -18,6 +19,11 @@ export default new Router({
       path: '/CMS',
       name: 'CMS',
       component: CMS,
+    },
+    {
+      path: '/SEMD',
+      name: 'SEMD',
+      component: SEMD,
     },
     {
       path: '/default',

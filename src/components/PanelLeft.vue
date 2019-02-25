@@ -62,8 +62,6 @@ export default class LeftAsidePanel extends Vue {
    #panel-left {
       position: relative;
       height: calc(100% - 30px);
-      // background-color: grey;
-      // border-right: 1px solid #2c3e50;
       display: flex;
       overflow: hidden;
    }

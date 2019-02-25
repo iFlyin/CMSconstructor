@@ -5,7 +5,7 @@
             <input type="button" class="menu-text-button" value="Файл" @mouseover="active='file'">
             <ul class="menu-list" v-show="menuActive && (active==='file')">
                <li class="menu-list-item">
-                  <a class="menu-list-item-link" @click="$emit('newproject')">Новый проект</a>
+                  <a class="menu-list-item-link" @click="prompt()">Новый проект</a>
                </li>
                <li class="menu-list-item">
                   <a class="menu-list-item-link" @click.stop>
@@ -15,9 +15,10 @@
                      <li 
                         v-for="system of systemsList"
                         :key="system.uuid"
-                        class="menu-side-list-item" 
                         @click="$emit('initByID', system.uuid)"                        
-                     >{{system.name}}</li>
+                     >
+                     <a class="menu-side-list-item">{{system.name}}</a>
+                     </li>
                   </ul>
                </li>
                <li class="menu-list-item" >
@@ -134,6 +135,14 @@ export default class MainMenu extends Vue {
       if(e.code === 'KeyS' && e.ctrlKey === true) {e.preventDefault()}
    }
 
+   private prompt() {
+      const result = prompt('Укажите Systems ID для нового проекта');
+      // валидация!!!
+      result ?
+         this.$emit('newproject', result)
+         : alert('не верный ID');
+   }
+
    private mounted(): void {
       document.addEventListener('keyup', this.keyUpListner);
       document.addEventListener('keydown', this.fixPrevent, false);
@@ -157,7 +166,7 @@ export default class MainMenu extends Vue {
       align-items: center;
       width: 100%;
       height: 30px;
-      background-color: #2c3e50;
+      background-color: $colorGreen;
       padding: 0 10px;
       z-index: 1000000;
 
@@ -182,7 +191,7 @@ export default class MainMenu extends Vue {
          list-style: none;
          padding: 5px 0;
          margin: 0;
-         background-color: #2c3e50;
+         background-color: $colorGreen;
          color: #fff;
          font-size: 12px;
          box-shadow: 2px 2px 8px rgba(0, 0, 0, .33);
@@ -217,7 +226,6 @@ export default class MainMenu extends Vue {
             }
          }
 
-
       }
 
       &-side-list {
@@ -229,13 +237,18 @@ export default class MainMenu extends Vue {
          padding: 5px 0;
          margin: 0;
          margin-top: -5px;
-         background-color: #2c3e50;
+         background-color: $colorGreen;
          box-shadow: 2px 2px 8px rgba(0, 0, 0, .33);
+         
 
          &-item {
             display: flex;
             justify-content: flex-start;
             padding: 10px 25px;
+            cursor: pointer;
+            text-decoration: none;
+            color: #fff;
+            text-align: left;
 
             &:hover {
                background-color: grey;

@@ -53,13 +53,11 @@ export default class Accordion extends Vue {
       height: 100%;
       width: 100%;
       overflow: hidden;
-      background-color: #fff;
+      background-color: $colorDark;
 
       &-item {
          display: flex;
          flex-flow: column nowrap;
-         // box-sizing: border-box;
-         // border-top: 1px solid white;
       }
 
       &-active {
@@ -68,30 +66,30 @@ export default class Accordion extends Vue {
          & .accordion-content {
             display: block;
             flex: 1 1 auto;
-            // border-top: 1px solid white;
             padding: 5px;
             overflow: auto;
 
             &-item {
                box-sizing: border-box;
                padding: 10px;
-               // outline: 1px dashed #2c3e50;
-               border: 1px dashed #2c3e50;
+               border: 1px dashed $colorDark;
                margin-left: 10px;
                margin-right: 5px;
                margin-top: 7px;
                user-select: none;
-               background-color: #2c3e50;
+               background-color: $colorDark;
                color: white;
                opacity: 0.95;
+               border: 1px solid grey;
             }
          }
       }
 
       &-header {
          height: 44px;
-         background-color: #009688;
+         background-color: $colorDark;
          color: #fff;
+         border-bottom: 1px solid grey;
          box-sizing: border-box;
          display: flex;
          justify-content: flex-start;
@@ -100,12 +98,10 @@ export default class Accordion extends Vue {
          font-size: 15px;
          font-weight: bold;
          user-select: none;
-         // box-shadow: 0px -1px 1px 0px rgba(0, 0, 0, .35) inset;
       }
 
       &-content {
          display: none;
-         border-right: 2px solid #009688;
          box-sizing: border-box;
       }
    }

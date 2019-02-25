@@ -160,7 +160,7 @@ export default class CMSElement extends Vue {
     box-sizing: border-box;
     position: absolute;
     z-index: 100;
-    background-color: #2c3e50;
+    background-color: $colorDark;
     border-style: solid;
     border-color: transparent;
     border-radius: 10px;
@@ -168,7 +168,12 @@ export default class CMSElement extends Vue {
     box-shadow: 0 2px 8px rgba(0, 0, 0, .33);
 
     &-active {
-        border-color: #e1364c !important;
+        border-color: $colorGreen !important;
+        background-color: $colorGreen;
+
+        & .layout-cms-id {
+            border-color: $colorGreen;
+        }
     }
 
     &-header {
@@ -204,9 +209,7 @@ export default class CMSElement extends Vue {
         justify-content: center;
         align-items: center;
         padding: 5px;
-        // border-style: solid;
-        // border-color: #2c3e50;
-        border-right: 1px solid #2c3e50;
+        border-right: 1px solid $colorDark;
     }
 
     &-name {

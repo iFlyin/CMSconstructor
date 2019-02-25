@@ -5,6 +5,53 @@ import intersect from 'path-intersection';
 export default {
    namespaced: true,
    state: {
+      menu: [
+         {
+            name: 'Файл',
+            show: `menuActive && (active === 'file')`,
+            list: [
+               {
+                  name: 'Новый проект',
+                  click: 'prompt()',
+               },
+               {
+                  name: 'Загрузить проект',
+                  click: '',
+                  sublist: [
+                     {
+                        uuid: '57f7d380-15bc-4bf4-9137-27182bb69826',
+                        name: 'РИИСЗ',
+                        click: `$emit('initByID', system.uuid)`,
+                     },
+                     {
+                        uuid: 'b8a99645-0bd6-4052-a0f8-aaf612328274',
+                        name: 'СИСЗЛ',
+                        click: `$emit('initByID', system.uuid)`,
+                     },
+                     {
+                        uuid: 'fe0b9fbc-0b8b-4a3a-96ee-332ae84b5fa8',
+                        name: 'ИС МВ',
+                        click: `$emit('initByID', system.uuid)`,
+                     },
+                     {
+                        uuid: '1cb87d64-6bb1-4762-abc9-f9f5a81291a7',
+                        name: 'Паллиативная помощь',
+                        click: `$emit('initByID', system.uuid)`,
+                     },
+                  ],
+                  key: 'system.uuid',
+               },
+            ]
+         },
+         {
+            name: "Правка",
+            list: []
+         },
+         {
+            name: "Вид",
+            list: []
+         },
+      ],
       init: false,
       panel: {
          left: 0,
@@ -36,6 +83,7 @@ export default {
       zoom: 1,
       screenList: new Array(),
       cmsList: new Array(),
+      deleteList: new Array(),
       weblook: new Array(),
       webeffect: new Array(),
       effect2screen: {
@@ -229,6 +277,8 @@ export default {
          state.screenList.splice(payload, 1);
       },
       deleteCMS(state: any, payload: any): void {
+         const id = state.cmsList[payload].props.id;
+         state.deleteList.push(id);
          state.cmsList.splice(payload, 1);
       },
       clearCMSeffect(state: any, payload: any):void {
@@ -354,6 +404,7 @@ export default {
       },
       initNewProject(state: any) {
          state.init = true;
+         state.deleteList = new Array();
          state.screenList.push({
             props: { 
                id: -1,
@@ -426,8 +477,15 @@ export default {
       saveToService(state: any) {
          for (const CMS of state.cmsList) {
             const obj = JSON.stringify(CMS.props);
+            const params = JSON.stringify({
+               id: CMS.props.id,
+               systems_id: CMS.props.systems_id,
+               json: JSON.stringify(CMS.params),
+            })
             console.log(obj);
+            console.log(params);
          }
+         console.log(state.deleteList);
       },
    },
    actions: {
@@ -476,9 +534,10 @@ export default {
             const resp: any = await http.get(`/get/get_cms?systems_id=${id}`);
             context.commit('setSystemId', id);
             context.commit('initNewProject');
-            context.commit('panelResize', {dir: 'left', val: 240});
-            context.commit('panelResize', {dir: 'right', val: 240});
+            context.commit('panelResize', {dir: 'left', val: 250});
+            context.commit('panelResize', {dir: 'right', val: 320});
             context.commit('pushAll', resp.data);
+            console.log(resp.data);
             const data = context.getters.getCMSlist;
             for (const obj of data) {
                context.commit('setCMSeffect', {
@@ -492,6 +551,11 @@ export default {
          } catch (err) {
             console.log(err);
          }
-      }
+      },
+      // asyncGetImages: async (context: any, payload: any) => {
+      //    const url = 'http://172.16.1.48:9000/assets/images/';
+      //    const resp: any = await http.get(url);
+      //    console.log(resp);
+      // }
    }
 };

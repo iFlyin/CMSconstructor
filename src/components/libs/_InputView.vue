@@ -89,7 +89,7 @@ export default class InputView extends Vue {
       align-items: center;
       box-sizing: border-box;
       padding: 5px 20px;
-      border-top: 1px solid grey;
+      border-bottom: 1px solid grey;
       margin: 0 5px;
    }
 

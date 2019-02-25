@@ -2,7 +2,7 @@
   <div class="home">
     <router-link to="/"><img alt="ИМЦ логотип" src="../assets/logo.png"></router-link>
     <div id="nav">
-      <router-link class="disabledLink" to="/">Документы</router-link> |
+      <router-link to="/SEMD">Документы</router-link> |
       <router-link class="disabledLink" to="/">Формы</router-link> |
       <router-link to="/CMS">Процессы</router-link>
     </div>
@@ -28,10 +28,10 @@ export default class Home extends Vue {}
     padding: 30px;
     a {
       font-weight: bold;
-      color: #2c3e50;
+      color: $colorDark;
       
       &:hover {
-        color: #42b983;
+        color: $colorGreen;
       }
     }
   }

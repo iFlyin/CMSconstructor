@@ -4,7 +4,7 @@ import store from './store/_main';
 
 Vue.use( VuexHistory );
 const maxHistoryLength: number = 20;
-const watchStateNames: string[] = ['CMS/screenList', 'CMS/cmsList'];
+const watchStateNames: string[] = ['CMS/screenList', 'CMS/cmsList', 'CMS/deleteList'];
 const vuexHistory = new VuexHistory(store, watchStateNames, maxHistoryLength);
 
 export const history = {
@@ -22,3 +22,10 @@ export const history = {
 export const snapshot = {
     methods: { saveSnapshot() { vuexHistory.saveSnapshot(); } },
 };
+
+export const colors = {
+    data: () => ({
+        colorDark: '#2c3e50',
+        colorGreen: '#009688',
+    }),
+}

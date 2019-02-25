@@ -113,7 +113,6 @@ export default class ElSelect extends Vue{
          align-items: center;
          height: 100%;
          box-sizing: border-box;
-         // border: 1px solid #b3b3b3;
          width: 40px;
       }
 
@@ -138,8 +137,8 @@ export default class ElSelect extends Vue{
       overflow-x: hidden;
       overflow-y: auto;
       background-color: snow;
-      outline: 2px solid #2c3e50;
-      color: #2c3e50;
+      outline: 2px solid $colorDark;
+      color: $colorDark;
    }
 
    .option-item {
@@ -148,18 +147,16 @@ export default class ElSelect extends Vue{
       text-align: left;
 
       &:hover {
-         background-color: #2c3e50;
+         background-color: $colorDark;
          color: #fff;
       }
    }
 
    .list-wrapper {
       position: fixed;
-      // z-index: -1;
       top: 0;
       left: 0;
       width: 100%;
       height: 100%;
-      // background-color: red;
    }
 </style>

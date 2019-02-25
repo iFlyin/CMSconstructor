@@ -72,7 +72,7 @@ export default class Footer extends Vue {
       height: calc(100% - 30px);
       background-color: #fff;
       overflow: hidden;
-      border-top: 1px solid #2c3e50;
+      border-top: 1px solid $colorDark;
    }
 
    .ns-resize {

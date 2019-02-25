@@ -76,9 +76,7 @@ export default class RightAsidePanel extends Vue {
       position: relative;
       background-color: #fff;
       overflow: auto;
-      // border-left: 1px solid #2c3e50;
       box-sizing: border-box;
-      // height: 100%;
    }
 
    .ew-resize {
