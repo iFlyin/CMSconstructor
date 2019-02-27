@@ -11,14 +11,13 @@
          :style="{ right: (width - 5) + 'px' }"
          @mousedown.prevent="resize()"
       />
-      <cms-form/>
+      <slot></slot>
    </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component} from 'vue-property-decorator';
 import cmsForm from './CMSForm.vue';
-// import { mapGetters } from 'vuex';
 
 @Component({
    components: { cmsForm },
@@ -32,7 +31,6 @@ import cmsForm from './CMSForm.vue';
          required: true,
       }
    },
-   // computed: { ...mapGetters('businessLogic', ['getWebLook']) }
 })
 export default class RightAsidePanel extends Vue {
    public width!: number;
@@ -41,7 +39,6 @@ export default class RightAsidePanel extends Vue {
    public resize(this: any): void {
       const that: any = this;
       const maxWidth: number = this.$el.parentNode.clientWidth;
-      console.log(this.height);
 
       function move(this: any, e: MouseEvent): void {
          const innerWidth = this.innerWidth;

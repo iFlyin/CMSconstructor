@@ -25,7 +25,7 @@
                         v: $event,
                         id: item.props.id,
                         callback: saveSnapshot,
-                    }), effect = $event"
+                    })"
                 />
             </div>
         </div>
@@ -61,8 +61,9 @@ interface cmsStyle {
             lookName: 'getLookName',
             // перенести или нет
             webEffect: 'getWebEffect',
-            panel: 'getPanel'
+            // panel: 'getPanel'
         }),
+        ...mapGetters({ panel: 'getPanel', })
     },
     methods: {
         ...mapMutations('CMS', {
@@ -132,11 +133,11 @@ export default class CMSElement extends Vue {
       
         function move(e: MouseEvent): void {
             let x = (e.clientX - offsetX - that.panel.left) / that.zoom  + scrollX - parentOffsetX;
-            if (x < 0) { x = 0; }
-            if (x > maxX) { x = maxX}
+            if (x < 2) { x = 2; }
+            if (x > maxX - 2) { x = maxX - 2}
             let y = (e.clientY - 30 - offsetY) / that.zoom + scrollY - parentOffsetY;
-            if (y < 0) { y = 0; }
-            if (y > maxY) { y = maxY}
+            if (y < 2) { y = 2; }
+            if (y > maxY - 2) { y = maxY - 1}
             // заменить на seter vuex
             that.cmsList[index].params.X = x;
             that.cmsList[index].params.Y = y;
@@ -200,7 +201,7 @@ export default class CMSElement extends Vue {
          
         &:first-child{
             background-color: #fff;
-            color: #2c3e50;
+            color: $colorDark;
         }
     }
 

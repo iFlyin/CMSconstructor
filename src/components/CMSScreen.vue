@@ -11,7 +11,7 @@
             width: item.params.width + 'px',
             height: item.params.height + 'px',
             'border-width': 2 / zoom + 'px',
-            'border-color': '#2c3e50',
+            'border-color': colorGrey,
             'border-style': 'solid'
          }"
          @click.stop.prevent="select({ id: item.props.id, type: 'Screen' })"
@@ -20,7 +20,7 @@
             <screen-resize v-if="isSelected" :zoom="zoom" @resize="resize($event)"/>
             <div class="layout-item-content">
                <div class="layout-item-header" @drop.stop @mousedown.stop="movement($event)" :style="{
-                  background: isSelected ? colorGreen : colorDark
+                  background: isSelected ? colorGreen : colorGrey
                }">
                   <!-- вынести в getter!!! -->
                   {{ (item.props.id &lt; 0) ? -(item.props.id) : '' }} {{item.props.name || 'Пустой экран'}}
@@ -86,15 +86,16 @@ import ScreenResize from './CMSResize.vue';
     props: { item: { type: Object, required: true } },
     mixins: [ snapshot, colors ],
     computed: {
-        ...mapGetters('CMS', {
+         ...mapGetters('CMS', {
             id: 'getID',
             cmsList: 'getCMSlist',
             zoom: 'getZoom',
             screenList: 'getScreenList',
             selected: 'getSelected',
             addProps: 'getProp',
-            panel: 'getPanel',
+            
         }),
+        ...mapGetters({ panel: 'getPanel' })
     },
     methods: {
         ...mapMutations('CMS', {
@@ -297,13 +298,13 @@ export default class CMSScreen extends Vue {
       const centerY = item.params.height/2;
       let posX = e.offsetX / this.zoom - centerX;
       const rightX = posX + item.params.width;
-      if (posX < 0) { posX = 0 }
-      if (rightX > this.width) { posX = this.width - item.params.width - (4 / this.zoom); }
+      if (posX < 2) { posX = 2 }
+      if (rightX > this.width) { posX = this.width - item.params.width - (2 / this.zoom); }
       let posY = e.offsetY / this.zoom - centerY;
       const bottomY = posY + item.params.height;
-      if (posY < 0) { posY = 0 }
+      if (posY < 2) { posY = 2 }
       // 70 костыль, потому как точную высоту не узнать!
-      if (bottomY > (this.height - 40)) { posY = (this.height - 70) - item.params.height - (4 / this.zoom); }
+      if (bottomY > (this.height - 40)) { posY = (this.height - 70) - item.params.height - (2 / this.zoom); }
       item.params.X = posX;
       item.params.Y = posY;
       this.setID(this.id + 1);
@@ -345,7 +346,7 @@ export default class CMSScreen extends Vue {
 <style lang="scss" scoped>
    .layout-item {
       border-style: solid;
-      border-color: $colorDark;
+      border-color: $colorGrey;
       box-sizing: border-box;
       z-index: 1001;
       position: absolute;
@@ -376,7 +377,7 @@ export default class CMSScreen extends Vue {
          align-items: center;
          user-select: none;
          cursor: move;
-         background-color: $colorDark;
+         background-color: $colorGrey;
          color: #fff;
       }
 

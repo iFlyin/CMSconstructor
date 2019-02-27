@@ -5,59 +5,7 @@ import intersect from 'path-intersection';
 export default {
    namespaced: true,
    state: {
-      menu: [
-         {
-            name: 'Файл',
-            show: `menuActive && (active === 'file')`,
-            list: [
-               {
-                  name: 'Новый проект',
-                  click: 'prompt()',
-               },
-               {
-                  name: 'Загрузить проект',
-                  click: '',
-                  sublist: [
-                     {
-                        uuid: '57f7d380-15bc-4bf4-9137-27182bb69826',
-                        name: 'РИИСЗ',
-                        click: `$emit('initByID', system.uuid)`,
-                     },
-                     {
-                        uuid: 'b8a99645-0bd6-4052-a0f8-aaf612328274',
-                        name: 'СИСЗЛ',
-                        click: `$emit('initByID', system.uuid)`,
-                     },
-                     {
-                        uuid: 'fe0b9fbc-0b8b-4a3a-96ee-332ae84b5fa8',
-                        name: 'ИС МВ',
-                        click: `$emit('initByID', system.uuid)`,
-                     },
-                     {
-                        uuid: '1cb87d64-6bb1-4762-abc9-f9f5a81291a7',
-                        name: 'Паллиативная помощь',
-                        click: `$emit('initByID', system.uuid)`,
-                     },
-                  ],
-                  key: 'system.uuid',
-               },
-            ]
-         },
-         {
-            name: "Правка",
-            list: []
-         },
-         {
-            name: "Вид",
-            list: []
-         },
-      ],
       init: false,
-      panel: {
-         left: 0,
-         right: 0,
-         // footer: 0,
-      },
       systems_list: [
          {
             uuid: '57f7d380-15bc-4bf4-9137-27182bb69826',
@@ -190,10 +138,10 @@ export default {
          add_params: null,
          check_right: null,
       },
+      loading: false,
    },
    getters: {
       getInitStatus(state: any) { return state.init },
-      getPanel(state: any) { return state.panel},
       getSystemsList(state: any) { return state.systems_list },
       getScreenList(state: any) { return state.screenList},
       getID(state: any) { return state.id },
@@ -207,7 +155,7 @@ export default {
       getPropList(state: any) { return state.prop_type },
       getSelected(state: any) { return state.selected },
       getSelectedType(state: any) { return state.selectedType },
-      getSystemID (state: any) { return state.systems_id },
+      getSystemID(state: any) { return state.systems_id },
       getLookName: (state: any) => (id: number) => {
          const index = state.weblook.findIndex((el: any) => el.id === id);
          return (index > -1)
@@ -219,12 +167,10 @@ export default {
          return (index > -1)
             ? state.webeffect[index].name
             : 'Не задан';
-      }
+      },
+      getLoading(state: any) { return state.loading; },
    },
    mutations: {
-      panelResize(state: any, payload: any): void {
-         state.panel[payload.dir] = payload.val;
-      },
       setID(state: any, payload: any): void {
          state.id = payload;
       },
@@ -303,7 +249,8 @@ export default {
          state.webeffect = payload;
       },
       setCMSeffect(state: any, payload: any) {
-         const CMSindex = state.cmsList.findIndex((el: any) => el.props.id == payload.id);
+         // console.log(payload.id);
+         const CMSindex = state.cmsList.findIndex((el: any) => el.props.id === payload.id);
          const CMSpath = state.cmsList[CMSindex];
          CMSpath.props.effect = payload.v;
          const parentID = CMSpath.props.parent_id;
@@ -325,8 +272,8 @@ export default {
          };
 
          const CMScenter = {
-            X: CMS.X + (CMS.W /2),
-            Y: CMS.Y + (CMS.H /2),
+            X: CMS.X + (CMS.W / 2),
+            Y: CMS.Y + (CMS.H / 2),
          };
 
          const path1 = rectConstructor(parent.X, parent.Y, parent.W, parent.H);
@@ -340,7 +287,7 @@ export default {
 
          const childIndex = state.screenList.findIndex((el: any) => el.props.id === payload.id);
 
-         if (childIndex != -1) {
+         if (childIndex !== -1) {
             X = state.screenList[childIndex].params.X;
             Y = state.screenList[childIndex].params.Y;
             clear(payload.id);
@@ -373,16 +320,16 @@ export default {
             return `M${x1},${y1}L${x2},${y2}`;
          }
 
-         function clear (id: any) {
-            const list = state.cmsList.filter((el: any) => el.props.parent_id == id);
+         function clear(id: any) {
+            const list = state.cmsList.filter((el: any) => el.props.parent_id === id);
             if (list.length > 0) {
                for (const child of list) {
                   clear(child.props.id);
-                  const childIndex = state.cmsList.findIndex((el: any) => el.props.id == child.id);
-                  state.cmsList.splice(childIndex, 1);
+                  // const childIndex = state.cmsList.findIndex((el: any) => el.props.id === child.props.id);
+                  state.cmsList.splice(state.cmsList.findIndex((el: any) => el.props.id === child.props.id), 1);
                }
             }
-            const newIndex = state.screenList.findIndex((item: any) => item.props.id == id);
+            const newIndex = state.screenList.findIndex((item: any) => item.props.id === id);
             if (newIndex !== -1) {
                state.screenList.splice(newIndex, 1);
             }
@@ -487,6 +434,8 @@ export default {
          }
          console.log(state.deleteList);
       },
+      loadTrue(state: any) { state.loading = true; },
+      loadFalse(state: any) { state.loading = false; },
    },
    actions: {
       asyncGetLook: async (context: any) => {
@@ -529,15 +478,17 @@ export default {
       },
       asyncGetCMSbyId: async (context: any, payload: any) => {
          try {
+            context.commit('loadTrue');
+            console.log(context.state.loading);
             const id = payload.id;
             context.commit('clearAll');
             const resp: any = await http.get(`/get/get_cms?systems_id=${id}`);
             context.commit('setSystemId', id);
             context.commit('initNewProject');
-            context.commit('panelResize', {dir: 'left', val: 250});
-            context.commit('panelResize', {dir: 'right', val: 320});
+            context.commit('panelResize', {dir: 'left', val: 250}, { root: true });
+            context.commit('panelResize', {dir: 'right', val: 320}, { root: true });
             context.commit('pushAll', resp.data);
-            console.log(resp.data);
+            // console.log(resp.data);
             const data = context.getters.getCMSlist;
             for (const obj of data) {
                context.commit('setCMSeffect', {
@@ -546,6 +497,8 @@ export default {
                });
             }
             payload.callback();
+            context.commit('loadFalse');
+            console.log(context.state.loading);
             // clear();
             // console.log(data);
          } catch (err) {

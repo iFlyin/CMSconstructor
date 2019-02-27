@@ -1,6 +1,6 @@
 <template>
-  <div id="constructor">
-    <main-menu @newproject="initialize($event)" @initByID="asyncGetCMSbyId({
+  <div id="constructor" :style="{ cursor: loading ? 'wait': 'auto' }">
+    <main-menu @newproject="prompt()" @initByID="asyncGetCMSbyId({
       id: $event,
       callback: clearHistory,
     })"/>
@@ -15,10 +15,12 @@
     </panel-left>
     <!-- <div class="flex-column"> -->
       <div class="flex-row">
-        <app-canvas :width="canvasWidth" :height="canvasHeight">
+        <panel-canvas :width="canvasWidth" :height="canvasHeight">
           <layout-b-l :left="panel.left"/>
-        </app-canvas>
-        <panel-right :width="panel.right" :height="canvasHeight" @resize="panelResize({dir: 'right', val: $event})" v-if="init"/> 
+        </panel-canvas>
+        <panel-right :width="panel.right" :height="canvasHeight" @resize="panelResize({dir: 'right', val: $event})" v-if="init">
+          <cms-form/>
+        </panel-right>
       </div>
       <!-- <panel-footer :height="panel.right" :width="canvasWidth + panel.right" @resize="panelResize({dir: 'footer', val: $event})"/> -->
     <!-- </div> -->
@@ -33,29 +35,32 @@ import MainMenu from '@/components/PanelMenu.vue';
 import PanelLeft from '@/components/PanelLeft.vue';
 import PanelRight from '@/components/PanelRight.vue';
 import PanelFooter from '@/components/PanelFooter.vue';
-import AppCanvas from '@/components/PanelCanvas.vue';
+import PanelCanvas from '@/components/PanelCanvas.vue';
 import Accordion from '@/components/PanelAccordion.vue';
 import LayoutBL from '@/components/CMSLayout.vue';
+import cmsForm from '@/components/CMSForm.vue';
 
 @Component ({
-  components: { MainMenu, PanelLeft, PanelRight, PanelFooter, AppCanvas, Accordion, LayoutBL },
+  components: { MainMenu, PanelLeft, PanelRight, PanelFooter, PanelCanvas, Accordion, LayoutBL, cmsForm },
   mixins: [ history, snapshot ],
   computed: {
     ...mapGetters('CMS', {
       weblook: 'getWebLook', 
       system_id: 'getSystemID',
       init: 'getInitStatus',
-      panel: 'getPanel',
+      loading: 'getLoading',
     }),
+    ...mapGetters({ panel: 'getPanel',  })
   },
   methods: { 
     ...mapActions('CMS', ['asyncGetLook', 'asyncGetEffect', 'asyncGetCMSbyId', 'asyncGetID', 'asyncGetImages']), 
     ...mapMutations('CMS', {
       addFirstScreen: 'initNewProject', 
       clearAll: 'clearAll',
-      panelResize: 'panelResize',
+      // panelResize: 'panelResize',
       setSystemId: 'setSystemId',
     }),
+    ...mapMutations({ panelResize: 'panelResize' })
   },
 })
 
@@ -107,6 +112,14 @@ export default class CMS extends Vue {
   private get canvasHeight(): number {
     return this.windowHeight - 30 //- this.panel.footer;
   }
+
+  private prompt() {
+      const result = prompt('Укажите Systems ID для нового проекта');
+      // валидация!!!
+      result ?
+         this.initialize(result)
+         : alert('не верный ID');
+   }
 
   public initialize(e: string) {
     const init = () => {

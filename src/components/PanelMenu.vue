@@ -2,14 +2,14 @@
    <div id="menu">
       <nav @click="menuActive = !menuActive">
          <div class="menu-container">
-            <input type="button" class="menu-text-button" value="Файл" @mouseover="active='file'">
+            <input type="button" class="menu-text-button" :value="cfg.file" @mouseover="active='file'">
             <ul class="menu-list" v-show="menuActive && (active==='file')">
                <li class="menu-list-item">
-                  <a class="menu-list-item-link" @click="prompt()">Новый проект</a>
+                  <a class="menu-list-item-link" @click="$emit('newproject')">{{cfg.new}}</a>
                </li>
                <li class="menu-list-item">
                   <a class="menu-list-item-link" @click.stop>
-                     Загрузить проект
+                     {{cfg.load}}
                   </a>
                   <ul class="menu-side-list">
                      <li 
@@ -23,17 +23,17 @@
                </li>
                <li class="menu-list-item" >
                   <a class="menu-list-item-link" @click="upload()">
-                     Сохранить
+                     {{cfg.save}}
                   </a>
                </li>
                <li class="menu-list-item">
                   <a class="menu-list-item-link" id="save-to-file" @click="save($event.target)">
-                     Сохранить в файл
+                     {{cfg.saveFile}}
                   </a>
                </li>
                <li class="menu-list-item">
                   <label for ="inputfile" class="menu-list-item-link" @click.stop>
-                     Загрузить из файла
+                     {{cfg.loadFile}}
                   </label>
                   <input type="file" class="inputfile" id="inputfile" @change="load({
                      file: $event,
@@ -41,33 +41,33 @@
                   })">
                </li>
                <li class="menu-list-item" >
-                  <a class="menu-list-item-link" @click="$router.push({ path: '/' })">Выход</a>
+                  <a class="menu-list-item-link" @click="$router.push({ path: '/' })">{{cfg.exit}}</a>
                </li>
             </ul>
          </div>
          <div class="menu-container">
-            <input type="button" class="menu-text-button" value="Правка" @mouseover="active='edit'">
+            <input type="button" class="menu-text-button" :value="cfg.edit" @mouseover="active='edit'">
             <ul class="menu-list" v-show="menuActive && (active==='edit')">
                <li class="menu-list-item">
                   <a class="menu-list-item-link" :style="{ cursor: canUndo ? 'pointer' : 'not-allowed' }" @click="undo()">
-                     <span>Отменить</span><font-awesome-icon icon="undo-alt"/>
+                     <span>{{cfg.undo}}</span><font-awesome-icon icon="undo-alt"/>
                   </a>
                </li>
                <li class="menu-list-item">
                   <a class="menu-list-item-link" :style="{ cursor: canRedo ? 'pointer' : 'not-allowed' }" @click="redo()">
-                     <span>Повторить</span><font-awesome-icon icon="redo-alt"/>
+                     <span>{{cfg.redo}}</span><font-awesome-icon icon="redo-alt"/>
                   </a>
                </li>
             </ul>
          </div>
          <div class="menu-container">
-            <input type="button" class="menu-text-button" value="Вид" @mouseover="active='view'">
+            <input type="button" class="menu-text-button" :value="cfg.view" @mouseover="active='view'">
             <ul class="menu-list" v-show="menuActive && (active==='view')">
                <a class="menu-list-item-link" @click="panelToogle('left')">
-                  <span>Левая панель</span><font-awesome-icon :icon="left?'eye':'eye-slash'"/>
+                  <span>{{cfg.leftPanel}}</span><font-awesome-icon :icon="left?'eye':'eye-slash'"/>
                </a>
                <a class="menu-list-item-link" @click="panelToogle('right')">
-                  <span>Правая панель</span><font-awesome-icon :icon="right?'eye':'eye-slash'"/>
+                  <span>{{cfg.rightPanel}}</span><font-awesome-icon :icon="right?'eye':'eye-slash'"/>
                </a>
             </ul>
          </div>
@@ -80,10 +80,11 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { mapGetters, mapMutations } from 'vuex';
 import { history } from '@/mixins';
+import { cfg } from '@/cfg';
 @Component({ 
    mixins: [history], 
-   computed: {...mapGetters('CMS', {systemsList: 'getSystemsList', panels: 'getPanel'})},
-   methods: {...mapMutations('CMS', {save: 'saveToFile', load: 'loadFromFile', upload: 'saveToService', panelResize: 'panelResize'})}
+   computed: {...mapGetters('CMS', {systemsList: 'getSystemsList'}), ...mapGetters({ panels: 'getPanel' })},
+   methods: {...mapMutations('CMS', {save: 'saveToFile', load: 'loadFromFile', upload: 'saveToService',}), ...mapMutations({panelResize: 'panelResize'})}
 })
 export default class MainMenu extends Vue { 
    public menuActive: boolean = false;
@@ -95,6 +96,7 @@ export default class MainMenu extends Vue {
    public redo!: any;
    public upload!: any;
    public save!: any;
+   public cfg: any = cfg;
 
    public get left(): boolean {
       return this.panels.left > 2 
@@ -133,14 +135,6 @@ export default class MainMenu extends Vue {
 
    private fixPrevent(e: KeyboardEvent) {
       if(e.code === 'KeyS' && e.ctrlKey === true) {e.preventDefault()}
-   }
-
-   private prompt() {
-      const result = prompt('Укажите Systems ID для нового проекта');
-      // валидация!!!
-      result ?
-         this.$emit('newproject', result)
-         : alert('не верный ID');
    }
 
    private mounted(): void {

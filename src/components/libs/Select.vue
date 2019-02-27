@@ -1,6 +1,6 @@
 <template>
    <div class="select">
-      <div class="list-wrapper" v-if="show" @click.stop="show=false"></div>
+      <div class="list-wrapper" v-if="show" @click.stop="show=false" @wheel="(show = !show)"></div>
       <label class="select-label" @click="(show = !show), getPos()">
       <span>{{label}}</span>
       <div class="select-button">
@@ -24,6 +24,7 @@
                v-for="(option, index) of options"
                :key="index"
                @click="select(option.id)"
+               :class="{'active-item': selected === index}"
             >
                {{(option[name] &lt; 0) ? -(option[name]) : option.name}}
             </div>
@@ -137,7 +138,7 @@ export default class ElSelect extends Vue{
       overflow-x: hidden;
       overflow-y: auto;
       background-color: snow;
-      outline: 2px solid $colorDark;
+      outline: 2px solid $colorGreen;
       color: $colorDark;
    }
 
@@ -147,9 +148,14 @@ export default class ElSelect extends Vue{
       text-align: left;
 
       &:hover {
-         background-color: $colorDark;
+         background-color: $colorGreen;
          color: #fff;
       }
+   }
+
+   .active-item {
+      background-color: $colorDark;
+      color: #fff;
    }
 
    .list-wrapper {

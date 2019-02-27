@@ -40,6 +40,7 @@ import { snapshot } from '@/mixins';
             // Объединить в объект
             selected: 'getSelected',
             selectedType: 'getSelectedType',
+            loading: 'getLoading',
         }),
     },
     methods: {

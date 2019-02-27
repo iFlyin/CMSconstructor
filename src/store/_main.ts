@@ -1,6 +1,7 @@
 import Vue from 'vue';
 import Vuex from 'vuex';
 import CMS from './CMS';
+import SEMD from './SEMD';
 import createPersistedState from 'vuex-persistedstate';
 import { library } from '@fortawesome/fontawesome-svg-core';
 import {
@@ -27,5 +28,18 @@ Vue.use(Vuex);
 
 export default new Vuex.Store({
   plugins: [createPersistedState()],
-  modules: { CMS },
+  modules: { CMS, SEMD },
+  state: {
+       panel: {
+           left: 0,
+           right: 0,
+           footer: 0,
+       },
+    },
+    getters: {
+        getPanel(state: any) { return state.panel; },
+    },
+    mutations: {
+        panelResize(state: any, payload: any): void { state.panel[payload.dir] = payload.val; },
+    },
 });

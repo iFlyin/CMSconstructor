@@ -27,5 +27,6 @@ export const colors = {
     data: () => ({
         colorDark: '#2c3e50',
         colorGreen: '#009688',
+        colorGrey: 'grey',
     }),
 }
