@@ -3,6 +3,7 @@
         :class="{'layout-cms': true, 'layout-cms-active': isSelected}" 
         :style="layoutCMSstyle"
         @click.stop.prevent="select({ id: item.props.id, type: 'CMS' })"
+        draggable="false"
     >
         <div 
             class="layout-cms-header" 
@@ -13,6 +14,7 @@
             <div class="layout-cms-row">
                 <div class="layout-cms-id" :style="{'border-width' : 1 / zoom + 'px'}" v-html="item.props.id"/>
                 <div class="layout-cms-name" v-html="item.props.name"/>
+                <div class="layout-cms-gn" :style="{'border-width' : 1 / zoom + 'px'}" v-html="item.props.group_number"/>
             </div>
             <div class="layout-cms-row">
                 <!-- переписать на стандартный селект!!! -->
@@ -175,6 +177,10 @@ export default class CMSElement extends Vue {
         & .layout-cms-id {
             border-color: $colorGreen;
         }
+        
+        & .layout-cms-gn {
+            border-color: $colorGreen;
+        }
     }
 
     &-header {
@@ -196,13 +202,22 @@ export default class CMSElement extends Vue {
     }
 
     &-row {
-        overflow: hidden;
         display: flex;
+        flex-flow: row nowrap;
+        min-height: 40px;
          
         &:first-child{
             background-color: #fff;
             color: $colorDark;
         }
+    }
+
+    &-gn {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 5px;
+        border-left: 1px solid $colorDark;
     }
 
     &-id {
@@ -218,6 +233,8 @@ export default class CMSElement extends Vue {
         justify-content: center;
         align-items: center;
         padding: 5px;  
+        flex: 1 1 auto;
+        overflow: hidden;
     }
 
 }

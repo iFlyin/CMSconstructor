@@ -55,7 +55,7 @@ export default {
             type: 'el-readonly',
          },
          systems_id: {
-            desc: 'Cистема (подсистема), в которой используется данный раздел/СЭМД', 
+            desc: 'Cистема (подсистема), в которой используется данный раздел/СЭМД',
             type: 'el-readonly',
          },
          id: {
@@ -75,7 +75,7 @@ export default {
             type: 'el-input',
          },
          fullname: {
-            desc: 'Экранное полное наименование элемента при прорисовке веб-интерфейса', 
+            desc: 'Экранное полное наименование элемента при прорисовке веб-интерфейса',
             type: 'el-input',
          },
          description: {
@@ -127,7 +127,7 @@ export default {
          d_start: null,
          f_fin: null,
          d_modif: null,
-         name: 'Новый CMS',
+         name: null,
          fullname: null,
          description: null,
          group_number: null,
@@ -141,21 +141,21 @@ export default {
       loading: false,
    },
    getters: {
-      getInitStatus(state: any) { return state.init },
-      getSystemsList(state: any) { return state.systems_list },
-      getScreenList(state: any) { return state.screenList},
-      getID(state: any) { return state.id },
-      getZoom(state: any) {return state.zoom },
-      getScreen(state: any) { return state.screen },
-      getBlock(state: any) { return state.block},
-      getWebLook(state: any) { return state.weblook },
-      getWebEffect(state: any) { return state.webeffect },
-      getCMSlist(state: any) { return state.cmsList},
-      getProp(state: any) { return state.prop_default },
-      getPropList(state: any) { return state.prop_type },
-      getSelected(state: any) { return state.selected },
-      getSelectedType(state: any) { return state.selectedType },
-      getSystemID(state: any) { return state.systems_id },
+      getInitStatus(state: any) { return state.init; },
+      getSystemsList(state: any) { return state.systems_list; },
+      getScreenList(state: any) { return state.screenList; },
+      getID(state: any) { return state.id; },
+      getZoom(state: any) {return state.zoom; },
+      getScreen(state: any) { return state.screen; },
+      getBlock(state: any) { return state.block; },
+      getWebLook(state: any) { return state.weblook; },
+      getWebEffect(state: any) { return state.webeffect; },
+      getCMSlist(state: any) { return state.cmsList; },
+      getProp(state: any) { return state.prop_default; },
+      getPropList(state: any) { return state.prop_type; },
+      getSelected(state: any) { return state.selected; },
+      getSelectedType(state: any) { return state.selectedType; },
+      getSystemID(state: any) { return state.systems_id; },
       getLookName: (state: any) => (id: number) => {
          const index = state.weblook.findIndex((el: any) => el.id === id);
          return (index > -1)
@@ -177,13 +177,14 @@ export default {
       setZoom(state: any, payload: any): void {
          const clearZoom = Math.round((state.zoom * 10));
          const event = payload.e;
-         // const layout = payload.el;
-         // const realWidth = layout.clientWidth * state.zoom;
-         // const realHeight = layout.clientHeight * state.zoom;
-         // const mouseX = event.clientX - state.panel.left;
-         // const mouseY = event.clientY - 30;
-         // const offsetX = (mouseX / realWidth) * 100;
-         // const offsetY = (mouseY / realHeight) * 100;
+         const root: any = this._modules.root.state;
+         const layout = payload.el;
+         const realWidth = layout.clientWidth * state.zoom;
+         const realHeight = layout.clientHeight * state.zoom;
+         const mouseX = event.clientX - root.panel.left;
+         const mouseY = event.clientY - 30;
+         const offsetX = (mouseX / realWidth) * 100;
+         const offsetY = (mouseY / realHeight) * 100;
 
          if (event.deltaY > 0) {
             if (clearZoom === 3) {
@@ -197,18 +198,19 @@ export default {
                state.zoom = 1.5;
             } else {
                state.zoom += 0.1;
-               // const newClientW = (realWidth / state.zoom ) / 2;
-               // const newClientH = (realHeight / state.zoom ) / 2;
-               // const centerX = layout.clientWidth / 100 * offsetX;
-               // const centerY = layout.clientHeight / 100 * offsetY;
-               // const scrollX = (centerX - newClientW) > 0
-               //    ? centerX - newClientW
-               //    : 0;
-               // const scrollY = (centerY - newClientH) > 0
-               //    ? centerY - newClientH
-               //    : 0;
+               const newClientW = (realWidth / state.zoom ) / 2;
+               const newClientH = (realHeight / state.zoom ) / 2;
+               const centerX = layout.clientWidth / 100 * offsetX;
+               const centerY = layout.clientHeight / 100 * offsetY;
+               const scrollX = (centerX - newClientW) > 0
+                  ? centerX - newClientW
+                  : 0;
+               const scrollY = (centerY - newClientH) > 0
+                  ? centerY - newClientH
+                  : 0;
                // layout.scrollLeft += scrollX;
                // layout.scrollTop += scrollY;
+               payload.callback(scrollX, scrollY);
             }
          }
       },
@@ -227,7 +229,7 @@ export default {
          state.deleteList.push(id);
          state.cmsList.splice(payload, 1);
       },
-      clearCMSeffect(state: any, payload: any):void {
+      clearCMSeffect(state: any, payload: any): void {
          const index = state.cmsList.findIndex((el: any) => el.props.id === payload);
          if (index > -1) {state.cmsList[index].props.effect = ''; }
       },
@@ -235,7 +237,7 @@ export default {
          const CMSindex = state.cmsList.findIndex((el: any) => el.props.id === payload.id);
          const effect = state.cmsList[CMSindex].props.effect;
 
-         if (payload.value != '') {
+         if (payload.value !== '') {
             const index = state.screenList.findIndex((el: any) => el.props.id === payload.value);
             const screen = state.screenList[index];
             screen.props.id = payload.id;
@@ -243,7 +245,7 @@ export default {
          }
       },
       saveWebLook(state: any, payload: any) {
-         state.weblook = payload; 
+         state.weblook = payload;
       },
       saveWebEffect(state: any, payload: any) {
          state.webeffect = payload;
@@ -304,9 +306,9 @@ export default {
                   X,
                   Y,
                   width: 400,
-                  height: 320,
+                  height: 300,
                },
-            }
+            };
             state.screenList.push(newScreen);
          }
 
@@ -344,7 +346,7 @@ export default {
       setValue(state: any, payload: any) {
          const key = payload.key;
          const value = payload.v;
-         const index = state.cmsList.findIndex((cms: any) => cms.props.id == payload.id);
+         const index = state.cmsList.findIndex((item: any) => item.props.id === payload.id);
          const cms = state.cmsList[index];
          cms.props[key] = value;
          payload.callback();
@@ -353,7 +355,7 @@ export default {
          state.init = true;
          state.deleteList = new Array();
          state.screenList.push({
-            props: { 
+            props: {
                id: -1,
                name: 'Главный экран',
             },
@@ -362,9 +364,16 @@ export default {
                X: 120,
                Y: 40,
                width: 400,
-               height: 320,
-            }
-         })
+               height: 300,
+            },
+         });
+      },
+      closeProject(state: any) {
+         localStorage.clear();
+         state.init = false;
+         state.deleteList = new Array();
+         state.cmsList = new Array();
+         state.screenList = new Array();
       },
       clearAll(state: any) {
          state.systems_id = 'New system';
@@ -378,27 +387,27 @@ export default {
          state.systems_id = payload;
       },
       pushAll(state: any, payload: any) {
-         (function pushNew (parent_id: any) {
-            const CMS: any[] = payload.filter((el: any) => el.parent_id == parent_id);
-            for(let i = 0; i < CMS.length; i++) {
+         (function pushNew(parentID: any) {
+            const CMS: any[] = payload.filter((el: any) => el.parent_id === parentID);
+            for (const CMSitem of CMS) {
                const item = {
                   params: {
                      type: 'CMS',
-                     width: 160,
+                     width: 180,
                      height: 150,
-                     X: 10,
+                     X: 110,
                      Y: 10,
                   },
-                  props: CMS[i],
-               }
+                  props: CMSitem,
+               };
                state.cmsList.push(item);
-               pushNew(CMS[i].id);
+               pushNew(CMSitem.id);
             }
          })(null);
          // console.log(state.cmsList)
       },
       saveToFile(state: any, payload: any) {
-         console.log(payload);
+         // console.log(payload);
          const json = {
             cms: state.cmsList,
             screen: state.screenList,
@@ -428,22 +437,22 @@ export default {
                id: CMS.props.id,
                systems_id: CMS.props.systems_id,
                json: JSON.stringify(CMS.params),
-            })
-            console.log(obj);
-            console.log(params);
+            });
+            // console.log(obj);
+            // console.log(params);
          }
-         console.log(state.deleteList);
+         // console.log(state.deleteList);
       },
       loadTrue(state: any) { state.loading = true; },
       loadFalse(state: any) { state.loading = false; },
    },
    actions: {
       asyncGetLook: async (context: any) => {
-         try { 
+         try {
             const {data} = await http.get('get/get_web_look_from_manual?manual=web_look');
             context.commit('saveWebLook', data);
-         } catch(err) {
-            console.log(err);
+         } catch (err) {
+            // console.log(err);
             // context.commit('saveWebLook', weblook);
             // console.log(weblook);
          }
@@ -453,33 +462,34 @@ export default {
             const {data} = await http.get('get/get_web_effect_from_manual?manual=web_effect');
             context.commit('saveWebEffect', data);
          } catch (err) {
-            console.log(err);
+            // console.log(err);
             // context.commit('saveWebEffect', webeffect);
          }
       },
       asyncGetID: async (context: any) => {
          try {
             const resp: any = await http.get('get/get_cms');
-            const sortById: any[] = resp.data.sort((a: any, b: any)=>{
+            const sortById: any[] = resp.data.sort((a: any, b: any) => {
                if (a.id < b.id) {
                   return -1;
                } else if (a.id > b.id) {
                   return 1;
                } else {
-                  return console.log("ошибка ID не могут быть равными")
+                  return;
+                  // console.log("ошибка ID не могут быть равными")
                }
-            })
+            });
             const length = sortById.length;
             const lastID = sortById[length - 1].id;
             context.commit('setID', lastID);
          } catch (err) {
-            console.log(err);
+            // console.log(err);
          }
       },
       asyncGetCMSbyId: async (context: any, payload: any) => {
          try {
             context.commit('loadTrue');
-            console.log(context.state.loading);
+            // console.log(context.state.loading);
             const id = payload.id;
             context.commit('clearAll');
             const resp: any = await http.get(`/get/get_cms?systems_id=${id}`);
@@ -498,11 +508,11 @@ export default {
             }
             payload.callback();
             context.commit('loadFalse');
-            console.log(context.state.loading);
+            // console.log(context.state.loading);
             // clear();
             // console.log(data);
          } catch (err) {
-            console.log(err);
+            // console.log(err);
          }
       },
       // asyncGetImages: async (context: any, payload: any) => {
@@ -510,5 +520,5 @@ export default {
       //    const resp: any = await http.get(url);
       //    console.log(resp);
       // }
-   }
+   },
 };

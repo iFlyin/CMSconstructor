@@ -26,4 +26,8 @@ body {
   width: 100%;
 }
 
+// input:disabled, textarea:disabled {
+//   display: none;
+// }
+
 </style>

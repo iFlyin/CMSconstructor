@@ -293,7 +293,7 @@ export default class CMSScreen extends Vue {
          console.log(err);
          return;
       }
-      // console.log(item)
+      console.log(item)
       const centerX = item.params.width/2;
       const centerY = item.params.height/2;
       let posX = e.offsetX / this.zoom - centerX;

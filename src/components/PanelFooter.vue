@@ -6,7 +6,7 @@
          width: width + 'px',
       }"
    >
-      
+      <slot></slot>
       <div 
          class="ns-resize"
          :style="{ bottom: (height - 5) + 'px' }"
@@ -41,8 +41,8 @@ export default class Footer extends Vue {
          const innerHeight = this.innerHeight;
          const Y: number = innerHeight - e.clientY;
          let emitHeight;
-         if (Y < 1) {
-            emitHeight = 1;
+         if (Y < 2) {
+            emitHeight = 2;
            that.$emit('resize', emitHeight);
          } else if (Y > (innerHeight - 30)) {
             emitHeight = innerHeight - 30;
@@ -70,9 +70,9 @@ export default class Footer extends Vue {
       box-sizing: border-box;
       position: relative;
       height: calc(100% - 30px);
-      background-color: #fff;
+      // background-color: #fff;
       overflow: hidden;
-      border-top: 1px solid $colorDark;
+      // border-top: 1px solid $colorDark;
    }
 
    .ns-resize {

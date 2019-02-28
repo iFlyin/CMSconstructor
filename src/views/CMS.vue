@@ -13,7 +13,6 @@
         },
       ]"/>
     </panel-left>
-    <!-- <div class="flex-column"> -->
       <div class="flex-row">
         <panel-canvas :width="canvasWidth" :height="canvasHeight">
           <layout-b-l :left="panel.left"/>
@@ -22,8 +21,6 @@
           <cms-form/>
         </panel-right>
       </div>
-      <!-- <panel-footer :height="panel.right" :width="canvasWidth + panel.right" @resize="panelResize({dir: 'footer', val: $event})"/> -->
-    <!-- </div> -->
   </div>
 </template>
 
@@ -31,7 +28,6 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { mapGetters, mapActions, mapMutations} from 'vuex';
 import { history, snapshot } from '@/mixins';
-import MainMenu from '@/components/PanelMenu.vue';
 import PanelLeft from '@/components/PanelLeft.vue';
 import PanelRight from '@/components/PanelRight.vue';
 import PanelFooter from '@/components/PanelFooter.vue';
@@ -39,6 +35,7 @@ import PanelCanvas from '@/components/PanelCanvas.vue';
 import Accordion from '@/components/PanelAccordion.vue';
 import LayoutBL from '@/components/CMSLayout.vue';
 import cmsForm from '@/components/CMSForm.vue';
+import MainMenu from '@/components/CMSMenu.vue';
 
 @Component ({
   components: { MainMenu, PanelLeft, PanelRight, PanelFooter, PanelCanvas, Accordion, LayoutBL, cmsForm },
@@ -91,7 +88,7 @@ export default class CMS extends Vue {
       const newItem = {
         params: {
           type: 'CMS',
-          width: 160,
+          width: 180,
           height: 150,
         },
         props: {
@@ -117,17 +114,17 @@ export default class CMS extends Vue {
       const result = prompt('Укажите Systems ID для нового проекта');
       // валидация!!!
       result ?
-         this.initialize(result)
-         : alert('не верный ID');
+        this.initialize(result)
+        : alert('не верный ID');
    }
 
   public initialize(e: string) {
     const init = () => {
+      this.panelResize({dir: 'left', val: 240});
+      this.panelResize({dir: 'right', val: 320});
       this.setSystemId(e);
       this.addFirstScreen();
       this.asyncGetID();
-      this.panelResize({dir: 'left', val: 250});
-      this.panelResize({dir: 'right', val: 320});
     }
     if (!this.init) {
       init();

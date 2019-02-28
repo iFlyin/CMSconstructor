@@ -1,39 +1,42 @@
 <template>
     <div id="constructor">
-        <main-menu @newproject="initialize()" @initByID="asyncGetCMSbyId({
-            id: $event,
-            callback: clearHistory,
-        })"/>
-        <panel-left :width="panel.left" @resize="panelResize({dir: 'left', val: $event})">
-            <div class="semdL"></div>
+        <main-menu @newproject="initialize()"/>
+        <panel-left :width="panel.left" @resize="panelResize({dir: 'left', val: $event})" v-if="init">
+            <div class="semd"></div>
         </panel-left>
         <div class="flex-column">
             <div class="flex-row">
                 <panel-canvas :width="canvasWidth" :height="canvasHeight">
-                    <!-- <div class="semdL"></div> -->
+                    <semd-layout v-if="init"/>
                 </panel-canvas>
-                <panel-right :width="panel.right" :height="canvasHeight" @resize="panelResize({dir: 'right', val: $event})">
-                    <div class="semdR"></div>
+                <panel-right :width="panel.right" :height="canvasHeight" @resize="panelResize({dir: 'right', val: $event})" v-if="init">
+                    <div class="semd"></div>
                 </panel-right>
             </div>
-        </div>  
+            <panel-footer :height="panel.footer" :width="canvasWidth + panel.right" @resize="panelResize({dir: 'footer', val: $event})" v-if="init">
+                <div class="semd"></div>
+            </panel-footer>
+        </div> 
     </div>
 </template>
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { mapGetters, mapMutations } from 'vuex';
-import MainMenu from '@/components/PanelMenu.vue';
+import MainMenu from '@/components/SEMDMenu.vue';
 import PanelLeft from '@/components/PanelLeft.vue';
 import PanelRight from '@/components/PanelRight.vue';
 import PanelFooter from '@/components/PanelFooter.vue';
 import PanelCanvas from '@/components/PanelCanvas.vue';
-
+import SemdLayout from '@/components/SEMDLayout.vue';
 
 @Component({
-    components: { MainMenu, PanelLeft, PanelRight, PanelFooter, PanelCanvas }, 
-    computed: {...mapGetters({ panel: 'getPanel' })},
-    methods: {...mapMutations({ panelResize: 'panelResize' })},
+    components: { MainMenu, PanelLeft, PanelRight, PanelFooter, PanelCanvas, SemdLayout }, 
+    computed: {...mapGetters({ panel: 'getPanel' }), ...mapGetters('SEMD', {init: 'getInitStatus'})},
+    methods: { 
+        ...mapMutations({ panelResize: 'panelResize' }), 
+        ...mapMutations('SEMD', { newSEMD: 'newSEMD', closeProject: 'closeProject'}),
+    },
 })
 
 export default class SEMD extends Vue {
@@ -41,27 +44,33 @@ export default class SEMD extends Vue {
     private windowWidth: number = window.innerWidth;
     private windowHeight: number = window.innerHeight;
     private panelResize!: any;
+    private newSEMD!: any;
+    private init!: any;
 
     private get canvasWidth(): number {
         return this.windowWidth - this.panel.left - this.panel.right;
     }
 
     private get canvasHeight(): number {
-        return this.windowHeight - 30 //- this.panel.footer;
+        console.log(this.panel.footer);
+        return this.windowHeight - 30 - this.panel.footer;
     }
 
     public initialize(e: string) {
-    const init = () => {
-      this.panelResize({dir: 'left', val: 250});
-      this.panelResize({dir: 'right', val: 320});
-    }
-    // if (!this.init) {
-    //   init();
-    // } else {
+        console.log(this.newSEMD())
+        const init = () => {
+            this.panelResize({dir: 'left', val: 250});
+            this.panelResize({dir: 'right', val: 320});
+            this.panelResize({dir: 'footer', val: 200});
+            this.newSEMD();
+        }
+    if (!this.init) {
+      init();
+    } else {
     //   this.clearAll();
-    //   init();
+      init();
     //   this.clearHistory();
-    // }
+    }
   }
 
 } 
@@ -76,15 +85,12 @@ export default class SEMD extends Vue {
         overflow: hidden;
     }
 
-    .semdL {
-        background-color: red;
+    .semd {
+        box-sizing: border-box;
+        background-color: #b3b3b3;
         height: 100%;
         width: 100%;
-    }
-    .semdR {
-        background-color: blue;
-        height: 100%;
-        width: 100%;
+        border: 1px solid #fff;
     }
 
     .flex {

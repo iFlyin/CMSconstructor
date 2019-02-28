@@ -29,4 +29,4 @@ export const colors = {
         colorGreen: '#009688',
         colorGrey: 'grey',
     }),
-}
+};

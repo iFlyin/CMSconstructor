@@ -7,7 +7,9 @@
             id: 0,
             type: 'none',
         })"
+        @mousedown="layoutMove($event)"
         @mousewheel.stop.prevent="wheel($event)"
+        draggable="false"
     >
         <cms-screen 
             v-for="(screen, index) of screenList"
@@ -121,7 +123,65 @@ export default class LayoutBL extends Vue {
         this.setZoom({
             el: this.$el,
             e: e,
+            callback: this.setScroll,
         });
+    }
+
+    private setScroll(x: number, y: number): void {
+        // console.log(this.$el.s);
+
+        // const root: any = this._modules.root.state;
+        //  const layout = payload.el;
+        //  const realWidth = layout.clientWidth * state.zoom;
+        //  const realHeight = layout.clientHeight * state.zoom;
+        //  const mouseX = event.clientX - root.panel.left;
+        //  const mouseY = event.clientY - 30;
+        //  const offsetX = (mouseX / realWidth) * 100;
+        //  const offsetY = (mouseY / realHeight) * 100;
+
+        //  const newClientW = (realWidth / state.zoom ) / 2;
+        //        const newClientH = (realHeight / state.zoom ) / 2;
+        //        const centerX = layout.clientWidth / 100 * offsetX;
+        //        const centerY = layout.clientHeight / 100 * offsetY;
+        //        const scrollX = (centerX - newClientW) > 0
+        //           ? centerX - newClientW
+        //           : 0;
+        //        const scrollY = (centerY - newClientH) > 0
+        //           ? centerY - newClientH
+        //           : 0;
+               // layout.scrollLeft += scrollX;
+               // layout.scrollTop += scrollY;
+            // }
+
+
+        this.$nextTick(function set(){
+            this.$el.scrollLeft +=x;
+            this.$el.scrollTop +=y;
+        });
+    }
+
+    private layoutMove(e: any) {
+        const that = this;
+        const el: any = that.$el;
+
+        function move(e: MouseEvent): void {
+            el.requestPointerLock();
+            // that.$nextTick(function(){
+                el.scrollLeft -= e.movementX;
+                el.scrollTop -= e.movementY;
+            // })
+        }
+
+        function clean(this: any, e: MouseEvent) {
+            // el.exitPointerLock();
+            this.removeEventListener('mousemove', move);
+            this.removeEventListener('mouseup', clean);
+            document.exitPointerLock();
+        }
+
+        window.addEventListener('mousemove', move);
+        window.addEventListener('mouseup', clean);
+        // window.addEventListener('mouse', clean);
     }
 
     private keyUpListner(e: KeyboardEvent): void {if(e.code === 'Delete'){this.del()} }

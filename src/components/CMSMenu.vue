@@ -1,56 +1,99 @@
 <template>
-    <div id="menu">
-        <nav @click="menuActive = !menuActive">
-            <div class="menu-container">
-                <input type="button" class="menu-text-button" :value="config.file" @mouseover="active='file'">
-            </div>
-            <div class="menu-container">
-               <input type="button" class="menu-text-button" :value="config.edit" @mouseover="active='edit'">
-            </div>
-            <div class="menu-container">
-               <input type="button" class="menu-text-button" :value="config.view" @mouseover="active='view'">
-               <ul class="menu-list" v-show="menuActive && (active==='view')">
-                    <a class="menu-list-item-link" @click="panelToogle('left')">
-                       <span>{{cfg.leftPanel}}</span><font-awesome-icon :icon="left?'eye':'eye-slash'"/>
-                    </a>
-                    <a class="menu-list-item-link" @click="panelToogle('right')">
-                       <span>{{cfg.rightPanel}}</span><font-awesome-icon :icon="right?'eye':'eye-slash'"/>
-                    </a>
-                    <a class="menu-list-item-link" @click="panelToogle('footer')">
-                       <span>{{cfg.footer}}</span><font-awesome-icon :icon="footer?'eye':'eye-slash'"/>
-                    </a>
-                </ul>
-            </div>
-        </nav>
-        <close-button @close="close()"/>
-    </div>
+   <div id="menu">
+      <nav @click="menuActive = !menuActive">
+         <div class="menu-container">
+            <input type="button" class="menu-text-button" :value="cfg.file" @mouseover="active='file'">
+            <ul class="menu-list" v-show="menuActive && (active==='file')">
+               <li class="menu-list-item">
+                  <a class="menu-list-item-link" @click="$emit('newproject')">{{cfg.new}}</a>
+               </li>
+               <li class="menu-list-item">
+                  <a class="menu-list-item-link" @click.stop>
+                     {{cfg.load}}
+                  </a>
+                  <ul class="menu-side-list">
+                     <li 
+                        v-for="system of systemsList"
+                        :key="system.uuid"
+                        @click="$emit('initByID', system.uuid)"                        
+                     >
+                     <a class="menu-side-list-item">{{system.name}}</a>
+                     </li>
+                  </ul>
+               </li>
+               <li class="menu-list-item" >
+                  <a class="menu-list-item-link" @click="upload()">
+                     {{cfg.save}}
+                  </a>
+               </li>
+               <li class="menu-list-item">
+                  <a class="menu-list-item-link" id="save-to-file" @click="save($event.target)">
+                     {{cfg.saveFile}}
+                  </a>
+               </li>
+               <li class="menu-list-item">
+                  <label for ="inputfile" class="menu-list-item-link" @click.stop>
+                     {{cfg.loadFile}}
+                  </label>
+                  <input type="file" class="inputfile" id="inputfile" @change="load({
+                     file: $event,
+                     callback: clearHistory,
+                  })">
+               </li>
+               <li class="menu-list-item" >
+                  <a class="menu-list-item-link" @click="close()">{{cfg.exit}}</a>
+               </li>
+            </ul>
+         </div>
+         <div class="menu-container">
+            <input type="button" class="menu-text-button" :value="cfg.edit" @mouseover="active='edit'">
+            <ul class="menu-list" v-show="menuActive && (active==='edit')">
+               <li class="menu-list-item">
+                  <a class="menu-list-item-link" :style="{ cursor: canUndo ? 'pointer' : 'not-allowed' }" @click="undo()">
+                     <span>{{cfg.undo}}</span><font-awesome-icon icon="undo-alt"/>
+                  </a>
+               </li>
+               <li class="menu-list-item">
+                  <a class="menu-list-item-link" :style="{ cursor: canRedo ? 'pointer' : 'not-allowed' }" @click="redo()">
+                     <span>{{cfg.redo}}</span><font-awesome-icon icon="redo-alt"/>
+                  </a>
+               </li>
+            </ul>
+         </div>
+         <div class="menu-container">
+            <input type="button" class="menu-text-button" :value="cfg.view" @mouseover="active='view'">
+            <ul class="menu-list" v-show="menuActive && (active==='view')">
+               <a class="menu-list-item-link" @click="panelToogle('left')">
+                  <span>{{cfg.leftPanel}}</span><font-awesome-icon :icon="left?'eye':'eye-slash'"/>
+               </a>
+               <a class="menu-list-item-link" @click="panelToogle('right')">
+                  <span>{{cfg.rightPanel}}</span><font-awesome-icon :icon="right?'eye':'eye-slash'"/>
+               </a>
+            </ul>
+         </div>
+      </nav>
+      <close-button @close="close()"/>
+   </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { mapGetters, mapMutations } from 'vuex';
 import { history } from '@/mixins';
-import { configSEMD } from '@/cfg';
+import { configCMS } from '@/cfg';
 import CloseButton from '@/components/PanelCloseButton.vue';
 
 @Component ({
-    components: { CloseButton },
-    mixins: [history],
-    props: {
-        parent: {
-            type: String,
-            required: true
-        },
-    },
-    computed: {...mapGetters({ panels: 'getPanel' }), ...mapGetters('SEMD', { init: 'getInitStatus' })},
-    methods: {...mapMutations({panelResize: 'panelResize'}), ...mapMutations('SEMD', {cleanState: 'closeProject'})},
+   components: { CloseButton },
+   mixins: [history],
+   computed: {...mapGetters('CMS', {systemsList: 'getSystemsList', init: 'getInitStatus'}), ...mapGetters({ panels: 'getPanel' })},
+   methods: {...mapMutations('CMS', {save: 'saveToFile', load: 'loadFromFile', upload: 'saveToService', cleanState: 'closeProject'}), ...mapMutations({panelResize: 'panelResize'})}
 })
-
 export default class CMSMenu extends Vue {
-   public config: any = configSEMD;
+   public cfg: any = configCMS;
    public menuActive: boolean = false;
-   public clearHistory!: any;
    public active: string = '';
+   public clearHistory!: any;
    public panels!: any;
    public panelResize!: any;
    public undo!: any;
@@ -71,12 +114,6 @@ export default class CMSMenu extends Vue {
          ? true
          : false;
    }
-   
-   public get footer(): boolean {
-      return this.panels.footer > 2 
-         ? true
-         : false;
-   }
 
    public panelToogle(this: any, dir: string) {
       if(this.init) {
@@ -84,22 +121,8 @@ export default class CMSMenu extends Vue {
             dir: dir,
             val: this[dir] ? 2 : dir === 'left'
                ? 280 
-               : dir === 'right'
-                  ? 320
-                  : 200,
-         });
-      }
-   }
-
-   private close() {
-      const req: boolean = confirm('Все несохраненные данные будут утерены. Вы действительно хотите выйти?');
-      if (req) {
-         this.$router.push({ path: '/' });
-         this.cleanState();
-         this.clearHistory();
-         this.panelResize({dir: 'left', val: 0});
-         this.panelResize({dir: 'right', val: 0});
-         this.panelResize({dir: 'footer', val: 0});
+               : 320,
+         })
       }
    }
 
@@ -120,6 +143,18 @@ export default class CMSMenu extends Vue {
 
    private fixPrevent(e: KeyboardEvent) {
       if(e.code === 'KeyS' && e.ctrlKey === true) {e.preventDefault()}
+   }
+
+   private close() {
+      const req: boolean = confirm('Все несохраненные данные будут утерены. Вы действительно хотите выйти?');
+      if (req) {
+         this.$router.push({ path: '/' });
+         this.cleanState();
+         this.clearHistory();
+         this.panelResize({dir: 'left', val: 0});
+         this.panelResize({dir: 'right', val: 0});
+         this.panelResize({dir: 'footer', val: 0});
+      }
    }
 
    private mounted(): void {
@@ -260,3 +295,4 @@ export default class CMSMenu extends Vue {
       display: none;
    }
 </style>
+

@@ -1,29 +1,58 @@
 <template>
-    <div id="menu">
-        <nav @click="menuActive = !menuActive">
-            <div class="menu-container">
-                <input type="button" class="menu-text-button" :value="config.file" @mouseover="active='file'">
-            </div>
-            <div class="menu-container">
-               <input type="button" class="menu-text-button" :value="config.edit" @mouseover="active='edit'">
-            </div>
-            <div class="menu-container">
-               <input type="button" class="menu-text-button" :value="config.view" @mouseover="active='view'">
-               <ul class="menu-list" v-show="menuActive && (active==='view')">
-                    <a class="menu-list-item-link" @click="panelToogle('left')">
-                       <span>{{cfg.leftPanel}}</span><font-awesome-icon :icon="left?'eye':'eye-slash'"/>
-                    </a>
-                    <a class="menu-list-item-link" @click="panelToogle('right')">
-                       <span>{{cfg.rightPanel}}</span><font-awesome-icon :icon="right?'eye':'eye-slash'"/>
-                    </a>
-                    <a class="menu-list-item-link" @click="panelToogle('footer')">
-                       <span>{{cfg.footer}}</span><font-awesome-icon :icon="footer?'eye':'eye-slash'"/>
-                    </a>
-                </ul>
-            </div>
-        </nav>
-        <close-button @close="close()"/>
-    </div>
+   <div id="menu">
+      <nav @click="menuActive = !menuActive">
+         <div class="menu-container">
+            <input type="button" class="menu-text-button" :value="cfg.file" @mouseover="active='file'">
+            <ul class="menu-list" v-show="menuActive && (active==='file')">
+               <li class="menu-list-item">
+                  <a class="menu-list-item-link" @click="$emit('newproject')">{{cfg.new}}</a>
+               </li>
+               <li class="menu-list-item">
+                  <a class="menu-list-item-link" @click.stop>{{cfg.save}}</a>
+               </li>
+               <li class="menu-list-item">
+                  <a class="menu-list-item-link" @click.stop>{{cfg.saveFile}}</a>
+               </li>
+               <li class="menu-list-item">
+                  <a class="menu-list-item-link" @click.stop>{{cfg.loadFile}}</a>
+               </li>
+               <li class="menu-list-item">
+                  <a class="menu-list-item-link" @click="close()">{{cfg.exit}}</a>
+               </li>
+            </ul>
+         </div>
+         <div class="menu-container">
+            <input type="button" class="menu-text-button" :value="cfg.edit" @mouseover="active='edit'">
+             <ul class="menu-list" v-show="menuActive && (active==='edit')">
+               <li class="menu-list-item">
+                  <a class="menu-list-item-link" :style="{ cursor: canUndo ? 'pointer' : 'not-allowed' }" @click="undo()">
+                     <span>{{cfg.undo}}</span><font-awesome-icon icon="undo-alt"/>
+                  </a>
+               </li>
+               <li class="menu-list-item">
+                  <a class="menu-list-item-link" :style="{ cursor: canRedo ? 'pointer' : 'not-allowed' }" @click="redo()">
+                     <span>{{cfg.redo}}</span><font-awesome-icon icon="redo-alt"/>
+                  </a>
+               </li>
+            </ul>
+         </div>
+         <div class="menu-container">
+            <input type="button" class="menu-text-button" :value="cfg.view" @mouseover="active='view'">
+            <ul class="menu-list" v-show="menuActive && (active==='view')">
+               <a class="menu-list-item-link" @click="panelToogle('left')">
+                  <span>{{cfg.leftPanel}}</span><font-awesome-icon :icon="left?'eye':'eye-slash'"/>
+               </a>
+               <a class="menu-list-item-link" @click="panelToogle('right')">
+                  <span>{{cfg.rightPanel}}</span><font-awesome-icon :icon="right?'eye':'eye-slash'"/>
+               </a>
+               <a class="menu-list-item-link" @click="panelToogle('footer')">
+                  <span>{{cfg.footer}}</span><font-awesome-icon :icon="footer?'eye':'eye-slash'"/>
+               </a>
+            </ul>
+         </div>
+      </nav>
+      <close-button @close="close()"/>
+   </div>
 </template>
 
 <script lang="ts">
@@ -34,20 +63,13 @@ import { configSEMD } from '@/cfg';
 import CloseButton from '@/components/PanelCloseButton.vue';
 
 @Component ({
-    components: { CloseButton },
-    mixins: [history],
-    props: {
-        parent: {
-            type: String,
-            required: true
-        },
-    },
-    computed: {...mapGetters({ panels: 'getPanel' }), ...mapGetters('SEMD', { init: 'getInitStatus' })},
-    methods: {...mapMutations({panelResize: 'panelResize'}), ...mapMutations('SEMD', {cleanState: 'closeProject'})},
+   components: { CloseButton },
+   mixins: [history],
+   computed: {...mapGetters({ panels: 'getPanel' }), ...mapGetters('SEMD', { init: 'getInitStatus' })},
+   methods: {...mapMutations({panelResize: 'panelResize'}), ...mapMutations('SEMD', {cleanState: 'closeProject'})},
 })
-
 export default class CMSMenu extends Vue {
-   public config: any = configSEMD;
+   public cfg: any = configSEMD;
    public menuActive: boolean = false;
    public clearHistory!: any;
    public active: string = '';
@@ -143,7 +165,7 @@ export default class CMSMenu extends Vue {
       align-items: center;
       width: 100%;
       height: 30px;
-      background-color: $colorGreen;
+      background-color: $colorDark;
       padding: 0 10px;
       z-index: 1000000;
    }
@@ -168,7 +190,7 @@ export default class CMSMenu extends Vue {
          list-style: none;
          padding: 5px 0;
          margin: 0;
-         background-color: $colorGreen;
+         background-color: $colorDark;
          color: #fff;
          font-size: 12px;
          box-shadow: 2px 2px 8px rgba(0, 0, 0, .33);
@@ -214,7 +236,7 @@ export default class CMSMenu extends Vue {
          padding: 5px 0;
          margin: 0;
          margin-top: -5px;
-         background-color: $colorGreen;
+         background-color: $colorDark;
          box-shadow: 2px 2px 8px rgba(0, 0, 0, .33);
          
 
