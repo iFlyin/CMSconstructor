@@ -52,12 +52,12 @@ export default class SEMD extends Vue {
     }
 
     private get canvasHeight(): number {
-        console.log(this.panel.footer);
+        // console.log(this.panel.footer);
         return this.windowHeight - 30 - this.panel.footer;
     }
 
     public initialize(e: string) {
-        console.log(this.newSEMD())
+        // console.log(this.newSEMD())
         const init = () => {
             this.panelResize({dir: 'left', val: 250});
             this.panelResize({dir: 'right', val: 320});

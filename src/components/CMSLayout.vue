@@ -128,7 +128,7 @@ export default class LayoutBL extends Vue {
     }
 
     private setScroll(x: number, y: number): void {
-        // console.log(this.$el.s);
+        console.log(this.$el);
 
         // const root: any = this._modules.root.state;
         //  const layout = payload.el;
