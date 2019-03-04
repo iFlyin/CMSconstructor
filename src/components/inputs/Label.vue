@@ -28,7 +28,7 @@ import ElInput from './Input.vue';
 import ElInputNumber from './InputNumber.vue';
 import ElTextarea from './TextArea.vue';
 import ElDatepicker from './DatePicker.vue';
-import ElSelect from './ElSelect.vue';
+import ElSelect from './Select.vue';
 
 @Component({
    components: { ElReadonly, ElInput, ElTextarea, ElDatepicker, ElSelect, ElInputNumber },

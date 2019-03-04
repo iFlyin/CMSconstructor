@@ -44,6 +44,7 @@ import { snapshot } from '@/mixins';
             selectedType: 'getSelectedType',
             loading: 'getLoading',
         }),
+        ...mapGetters({panel: 'getPanel'}),
     },
     methods: {
         ...mapMutations('CMS', {
@@ -72,6 +73,7 @@ export default class LayoutBL extends Vue {
     private selectedType!: string;
     private zoom!: number;
     private saveSnapshot!: any;
+    private panel!: any;
     // private undo!: any;
     // private redo!: any;
   
@@ -127,36 +129,27 @@ export default class LayoutBL extends Vue {
         });
     }
 
-    private setScroll(x: number, y: number): void {
-        console.log(this.$el);
+    private setScroll(e: any): void {
+        const el = this.$el;
+        const width = el.clientWidth;
+        const height = el.clientHeight;
+        const X = e.clientX - this.panel.left;
+        const Y = e.clientY - 30;
+        const offset = {
+            X: X / (width * this.zoom),
+            Y: Y / (height * this.zoom),
+        };
 
-        // const root: any = this._modules.root.state;
-        //  const layout = payload.el;
-        //  const realWidth = layout.clientWidth * state.zoom;
-        //  const realHeight = layout.clientHeight * state.zoom;
-        //  const mouseX = event.clientX - root.panel.left;
-        //  const mouseY = event.clientY - 30;
-        //  const offsetX = (mouseX / realWidth) * 100;
-        //  const offsetY = (mouseY / realHeight) * 100;
+        this.$nextTick(function() {
+            const widthNext = el.clientWidth;
+            const heightNext = el.clientHeight;
+            const scrollX = width - widthNext;
+            const scrollY = height - heightNext;
+            const scrollLeft = scrollX * offset.X;
+            const scrollTop = scrollY * offset.Y;
 
-        //  const newClientW = (realWidth / state.zoom ) / 2;
-        //        const newClientH = (realHeight / state.zoom ) / 2;
-        //        const centerX = layout.clientWidth / 100 * offsetX;
-        //        const centerY = layout.clientHeight / 100 * offsetY;
-        //        const scrollX = (centerX - newClientW) > 0
-        //           ? centerX - newClientW
-        //           : 0;
-        //        const scrollY = (centerY - newClientH) > 0
-        //           ? centerY - newClientH
-        //           : 0;
-               // layout.scrollLeft += scrollX;
-               // layout.scrollTop += scrollY;
-            // }
-
-
-        this.$nextTick(function set(){
-            this.$el.scrollLeft +=x;
-            this.$el.scrollTop +=y;
+            this.$el.scrollLeft +=scrollLeft;
+            this.$el.scrollTop +=scrollTop;
         });
     }
 
@@ -176,7 +169,8 @@ export default class LayoutBL extends Vue {
             // el.exitPointerLock();
             this.removeEventListener('mousemove', move);
             this.removeEventListener('mouseup', clean);
-            document.exitPointerLock();
+            const doc: any =  document;
+            doc.exitPointerLock();
         }
 
         window.addEventListener('mousemove', move);

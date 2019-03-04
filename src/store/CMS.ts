@@ -130,7 +130,7 @@ export default {
          name: null,
          fullname: null,
          description: null,
-         group_number: null,
+         group_number: 1,
          db_function_name: null,
          db_function_params: null,
          fields_list: null,
@@ -177,14 +177,6 @@ export default {
       setZoom(state: any, payload: any): void {
          const clearZoom = Math.round((state.zoom * 10));
          const event = payload.e;
-         const root: any = this._modules.root.state;
-         const layout = payload.el;
-         const realWidth = layout.clientWidth * state.zoom;
-         const realHeight = layout.clientHeight * state.zoom;
-         const mouseX = event.clientX - root.panel.left;
-         const mouseY = event.clientY - 30;
-         const offsetX = (mouseX / realWidth) * 100;
-         const offsetY = (mouseY / realHeight) * 100;
 
          if (event.deltaY > 0) {
             if (clearZoom === 3) {
@@ -198,19 +190,7 @@ export default {
                state.zoom = 1.5;
             } else {
                state.zoom += 0.1;
-               const newClientW = (realWidth / state.zoom ) / 2;
-               const newClientH = (realHeight / state.zoom ) / 2;
-               const centerX = layout.clientWidth / 100 * offsetX;
-               const centerY = layout.clientHeight / 100 * offsetY;
-               const scrollX = (centerX - newClientW) > 0
-                  ? centerX - newClientW
-                  : 0;
-               const scrollY = (centerY - newClientH) > 0
-                  ? centerY - newClientH
-                  : 0;
-               // layout.scrollLeft += scrollX;
-               // layout.scrollTop += scrollY;
-               payload.callback(scrollX, scrollY);
+               payload.callback(event, scrollX, scrollY);
             }
          }
       },

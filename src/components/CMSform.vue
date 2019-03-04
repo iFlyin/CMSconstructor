@@ -13,7 +13,7 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { mapGetters } from 'vuex';
-import AppInput from './libs/_InputView.vue';
+import AppInput from './inputs/Label.vue';
 @Component({
    components: { AppInput },
    computed: {...mapGetters('CMS', { 

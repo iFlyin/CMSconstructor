@@ -5,34 +5,29 @@
                 <font-awesome-icon icon="plus" size="2x"/>
             </button>
         </div>
+        <div class="wrapper">
+            <div class="header">
+                <div class="left">
+                    <div>Мастер-таблица</div>
+                    <div class="btn-group">
+                        <button class="trash-button"><font-awesome-icon icon="plus"/></button>
+                        <button class="trash-button"><font-awesome-icon icon="minus"/></button>
+                    </div>
+                </div>
+                <button class="trash-button"><font-awesome-icon icon="trash"/></button>
+            </div>
+            <app-table/>
+        </div>
         
     </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { mapGetters } from 'vuex'
-@Component({
-    computed: {
-        ...mapGetters('SEMD', { table: 'getTable' }),
-    }
-})
-export default class SEMDTable extends Vue {
-    public table!: any;
+import AppTable from '@/components/SEMDTable.vue';
 
-    public get thead(): string[] {
-        const header = new Array();
-        for (const row of this.table) {
-            for (const key in row) {
-                const check = (header.findIndex((el: any) => el === key)) === -1
-                    ? true
-                    : false;
-                if (check) { header.push(key); }
-            }
-        };
-        return header;
-    }
-}
+@Component({ components: { AppTable }})
+export default class SEMDTable extends Vue {}
 </script>
 
 
@@ -42,9 +37,9 @@ export default class SEMDTable extends Vue {
         &-wrapper {
             display: flex;
             width: 100%;
-            height: 200px;
+            // height: 200px;
             // background-color: #b3b3b3;
-            box-sizing: border-box;
+            box-sizing: border-box; 
             padding: 5px;
         }
 
@@ -63,6 +58,7 @@ export default class SEMDTable extends Vue {
                 color: $colorGreen;
                 background-color: #fff;
                 outline: none;
+                cursor: pointer;
 
                 &:hover {
                     background-color: $colorGreen;
@@ -70,26 +66,56 @@ export default class SEMDTable extends Vue {
                 }
             }
         }
+    }
 
-        &-table {
-            // background-color: red;
-            flex: 1 1 auto;
-            display: flex;
-            flex-flow: column nowrap;
-            // border: 1px dashed red;
-            // box-sizing: border-box;
-            padding: 5px;
-            border-collapse: collapse;
-        }
+    .wrapper {
+        width: 100%;
+        height: 100%;
+        border: 1px solid $colorDark;
+        // background-color: red;
 
-    
-        &-header {
-            background-color: $colorGreen;
+        & > .header {
+            background-color: $colorDark;
             color: #fff;
-            // width: 100%;
             height: 30px;
-            border: 1px dashed red;
-            border-spacing: 0;
+            width: 100%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 5px 10px;
+            box-sizing: border-box;
+
+            & > .left {
+                height: 100%;
+                flex: 1 1 auto;
+                display: flex;
+                flex-flow: row nowrap;
+                justify-content: flex-start;
+                align-items: center;
+            }
         }
+    }
+
+    .trash-button {
+        border: none;
+        background-color: transparent;
+        height: 25px;
+        width: 25px;
+        color: #fff;
+        outline: none;
+        cursor: pointer;
+        border-radius: 50%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        &:hover{
+            background-color: red;
+        }
+    }
+
+    .btn-group {
+        display: flex;
+        margin-left: 20px;
     }
 </style>

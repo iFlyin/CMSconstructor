@@ -2,10 +2,10 @@
    <div class="select">
       <div class="list-wrapper" v-if="show" @click.stop="show=false" @wheel="(show = !show)"></div>
       <label class="select-label" @click="(show = !show), getPos()">
-      <span>{{label}}</span>
-      <div class="select-button">
+      <!-- <span>{{label}}</span> -->{{ selectedEffect }}
+      <!-- <div class="select-button">
          <span class="select-text">{{(selected === '') ? 'Нет' : selected}}</span>
-      </div>
+      </div> -->
       </label>
       <template v-if="show">
          <div 
@@ -24,7 +24,7 @@
                v-for="(option, index) of options"
                :key="index"
                @click="select(option.id)"
-               :class="{'active-item': selected === index}"
+               :class="{'active-item': selected === option.id}"
             >
                {{(option[name] &lt; 0) ? -(option[name]) : option.name}}
             </div>
@@ -85,6 +85,15 @@ export default class ElSelect extends Vue{
       this.top = el.offsetTop + parent.offsetTop + el.offsetHeight + 44 + (30 / this.zoom) - scrollTop;
       this.left = el.offsetLeft + parent.offsetLeft + 4 +(canvas.left / this.zoom) - scrollLeft;
    }
+
+   private get selectedEffect(): string {
+      // console.log(this.options);
+      const index = this.options.findIndex((el: any) => el.id === this.selected)
+      const effectName = index !== -1
+         ? this.options[index] 
+         : '';
+      return effectName.name;
+   }
 }
 </script>
 
@@ -97,13 +106,14 @@ export default class ElSelect extends Vue{
 
       &-label {
          width: 100%;
-         height: 30px;
+         min-height: 30px;
          display: flex;
-         justify-content: space-between;
+         justify-content: center;
          align-items: center;
          cursor: pointer;
-         padding: 0 10px;
+         padding: 5px 10px;
          user-select: none;
+         box-sizing: border-box;
       }
 
       &-button {

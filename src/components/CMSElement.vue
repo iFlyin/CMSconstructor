@@ -3,7 +3,6 @@
         :class="{'layout-cms': true, 'layout-cms-active': isSelected}" 
         :style="layoutCMSstyle"
         @click.stop.prevent="select({ id: item.props.id, type: 'CMS' })"
-        draggable="false"
     >
         <div 
             class="layout-cms-header" 
@@ -14,7 +13,10 @@
             <div class="layout-cms-row">
                 <div class="layout-cms-id" :style="{'border-width' : 1 / zoom + 'px'}" v-html="item.props.id"/>
                 <div class="layout-cms-name" v-html="item.props.name"/>
-                <div class="layout-cms-gn" :style="{'border-width' : 1 / zoom + 'px'}" v-html="item.props.group_number"/>
+                <div class="layout-cms-gn" :style="{'border-width' : 1 / zoom + 'px'}">
+                    <input type="number" class="gn-input" min="1" max="999" :value="groupNumber">
+                </div>
+                <div class="element-resize" @mousedown.stop="resize($event)"/>
             </div>
             <div class="layout-cms-row">
                 <!-- переписать на стандартный селект!!! -->
@@ -39,7 +41,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import { mapGetters, mapMutations } from 'vuex';
 import { snapshot} from '@/mixins';
 // заменить на универсальный!!!
-import ElSelect from '@/components/libs/Select.vue';
+import ElSelect from '@/components/CMSSelect.vue';
 
 // вынести в файл интерфейсов
 interface cmsStyle {
@@ -72,6 +74,7 @@ interface cmsStyle {
             setEffect: 'setCMSeffect',
             select: 'setSelected',
             setXY: 'setXY',
+            setGN: 'setValue',
         }),
     },
 })
@@ -84,6 +87,7 @@ export default class CMSElement extends Vue {
     public panel!: any;
     public cmsList!: any;
     public screenList!: any;
+    public setGN!: any;
 
     public saveSnapshot!: any;
 
@@ -94,6 +98,25 @@ export default class CMSElement extends Vue {
     public setEffect!: any;
     public select!: any;
     public lookName!: any;
+
+    public get groupNumber(): number {
+        console.log('get');
+        return this.item.props.group_number;
+    }
+
+    public set groupNumber(v: number) {
+        console.log('set');
+        this.setGN({
+            v: v,
+            key: 'group_number',
+            id: this.item.props.id,
+            callback: this.saveSnapshot,
+        })
+    }
+
+    public console() {
+        console.log('change');
+    }
 
     public get isSelected(): boolean { return this.item.props.id === this.selected; }
     public get layoutCMSstyle(): cmsStyle {
@@ -154,6 +177,55 @@ export default class CMSElement extends Vue {
         window.addEventListener('mousemove', move);
         window.addEventListener('mouseup', clean);
     }
+
+    private resize(e: any) {
+        const that = this;
+        const layout = this.$parent.$el;
+        const id = this.item.props.id;
+        const index = this.cmsList.findIndex((item: any) => item.props.id == id);
+        const scrollX = layout.scrollLeft;
+        const scrollY = layout.scrollTop;
+        const parent: any = this.$parent;
+        const thatX = this.item.params.X;
+
+        function onResize(e: MouseEvent) {
+            const path = that.cmsList[index].params;
+            const move = that.item.params.width + e.movementX / that.zoom;
+
+            const maxX = parent.width - thatX - (4 / that.zoom) - 2;
+            console.log(maxX)
+            if (move <= 180) {
+                that.item.params.width = 180;
+                // переписать на Vuex
+            } else if ( move > maxX) {
+                that.item.params.width = maxX;
+            } else {
+                that.item.params.width = move;
+            }
+                // ? that.item.params.width = 180
+                // : that.item.params.width = move;
+            // that.item.params.width += e.movementX / that.zoom;
+                
+            // const newX = (e.clientX - that.panel.left) / that.zoom + scrollX;
+            // const newY = (e.clientY - 30) / that.zoom + scrollY;
+            // const minWidth = parent.minWidth;
+            // const minHeight = parent.minHeight;
+            // const moveX = e.movementX / that.zoom;
+            // const moveY = e.movementY / that.zoom;
+
+        
+            // if (path.width + moveX > minWidth) { path.width += moveX; } else { path.width =  minWidth; }
+        }   
+
+        function clean(this: any, e: MouseEvent) {
+            this.removeEventListener('mousemove', onResize);
+            this.removeEventListener('mouseup', clean);
+            that.saveSnapshot();
+        }
+
+        window.addEventListener('mousemove', onResize);
+        window.addEventListener('mouseup', clean);
+    }
 }
 </script>
 
@@ -189,7 +261,7 @@ export default class CMSElement extends Vue {
         display: flex;
         justify-content: center;
         min-height: 40px;
-        max-height: 80px;
+        // max-height: 80px;
         padding: 10px;
         cursor: move;
         user-select: none;
@@ -202,9 +274,10 @@ export default class CMSElement extends Vue {
     }
 
     &-row {
+        position: relative;
         display: flex;
         flex-flow: row nowrap;
-        min-height: 40px;
+        // min-height: 40px;
          
         &:first-child{
             background-color: #fff;
@@ -237,6 +310,28 @@ export default class CMSElement extends Vue {
         overflow: hidden;
     }
 
+
+
+}
+
+.element-resize {
+    // background-color: red;
+    width: 6px;
+    height: 100%;
+    z-index: 19999;
+    position: absolute;
+    top: 0;
+    right: -3px;
+    cursor: ew-resize;
+}
+
+.gn-input {
+    // width: 100%;
+    // max-width: 40px;
+    // border: none;
+    // display: flex;
+    // flex-flow: row wrap;
+    // user-select: auto;
 }
 
 </style>
