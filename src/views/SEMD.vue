@@ -1,13 +1,13 @@
 <template>
     <div id="constructor">
         <main-menu @newproject="initialize()"/>
-        <panel-left :width="panel.left" @resize="panelResize({dir: 'left', val: $event})" v-if="init">
+        <panel-left :width="panel.left" @resize="panelResize({dir: 'left', val: $event})">
             <app-list :list="SEMDs" @select="getSEMDbyID($event)"/>
         </panel-left>
         <div class="flex-column">
             <div class="flex-row">
                 <panel-canvas :width="canvasWidth" :height="canvasHeight">
-                    <semd-layout v-if="init"/>
+                    <semd-layout/>
                 </panel-canvas>
                 <panel-right :width="panel.right" :height="canvasHeight" @resize="panelResize({dir: 'right', val: $event})" v-if="init">
                     <app-config/>
@@ -36,15 +36,18 @@ import AppList      from '@/components/SEMDList.vue';
 @Component({
     components: { MainMenu, PanelLeft, PanelRight, PanelFooter, PanelCanvas, SemdLayout, TextEditor, AppConfig, AppList }, 
     computed: {
-        ...mapGetters({ panel: 'getPanel' }),
         ...mapGetters('SEMD', {
             init: 'getInitStatus',
             SEMDs: 'getSEMDs',
+            panel: 'getPanel',
         }),
     },
     methods: { 
-        ...mapMutations({ panelResize: 'panelResize' }), 
-        ...mapMutations('SEMD', { newSEMD: 'newSEMD', closeProject: 'closeProject'}),
+        ...mapMutations('SEMD', { 
+            newSEMD: 'newSEMD', 
+            closeProject: 'closeProject', 
+            panelResize: 'panelResize'
+        }),
         ...mapActions('SEMD', ['getSEMDs', 'getSEMDbyID']),
     },
 })
@@ -90,9 +93,9 @@ export default class SEMD extends Vue {
         this.getSEMDs();
     }
 
-    public console(e: any) {
-        console.log(e);
-    }
+    // public console(e: any) {
+    //     console.log(e);
+    // }
 
 } 
 </script>

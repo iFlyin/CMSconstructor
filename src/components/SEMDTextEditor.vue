@@ -22,7 +22,6 @@ import editor from 'vue2-ace-editor';
 })
 export default class TextEditor extends Vue {
     public content: string = 
-
         `WITH RECURSIVE r AS ( 
         select 1 AS level, coalesce(cast (parent_id as varchar), '...') as parent_id_, cms.name as name_, cms.description as description_, cms.* from tec.cms 
         where parent_id is null
@@ -38,7 +37,6 @@ export default class TextEditor extends Vue {
         SELECT id, parent_id, parent_id_, level, group_number, description_, name_, db_function_name, db_function_params, fields_list, look || ' - ' ||(select const_name || ' (' || name || ')' from tec.constants where manual = 'web_look' and const_value = cast(r.look as varchar)), effect || ' - ' ||(select const_name || ' (' || name || ')' from tec.constants where manual = 'web_effect' and const_value = cast(r.effect as varchar)), add_params FROM r
         order by systems_id, description_, parent_id_;
         `;
-    public content2: string = 'QwertyFun2';
     public theme: string = 'sqlserver';
 
     public editorInit(editor: any) {

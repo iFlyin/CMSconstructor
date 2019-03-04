@@ -65,8 +65,8 @@ import CloseButton from '@/components/PanelCloseButton.vue';
 @Component ({
    components: { CloseButton },
    mixins: [history],
-   computed: {...mapGetters({ panels: 'getPanel' }), ...mapGetters('SEMD', { init: 'getInitStatus' })},
-   methods: {...mapMutations({panelResize: 'panelResize'}), ...mapMutations('SEMD', {cleanState: 'closeProject'})},
+   computed: {...mapGetters('SEMD', { init: 'getInitStatus', panels: 'getPanel' })},
+   methods: {...mapMutations('SEMD', {cleanState: 'closeProject', panelResize: 'panelResize'})},
 })
 export default class CMSMenu extends Vue {
    public cfg: any = configSEMD;
@@ -101,7 +101,7 @@ export default class CMSMenu extends Vue {
    }
 
    public panelToogle(this: any, dir: string) {
-      if(this.init) {
+      if(this.init || dir === 'left') {
          this.panelResize({
             dir: dir,
             val: this[dir] ? 2 : dir === 'left'
@@ -119,14 +119,14 @@ export default class CMSMenu extends Vue {
          this.$router.push({ path: '/' });
          this.cleanState();
          this.clearHistory();
-         this.panelResize({dir: 'left', val: 0});
+         this.panelResize({dir: 'left', val: 320});
          this.panelResize({dir: 'right', val: 0});
          this.panelResize({dir: 'footer', val: 0});
       }
    }
 
    private keyUpListner(e: KeyboardEvent): void {
-      console.log(e);
+      // console.log(e);
       if(e.code === 'KeyZ' && e.ctrlKey === true) {this.undo()}
       if(e.code === 'KeyY' && e.ctrlKey === true) {this.redo()}
       if(e.code === 'ArrowLeft' && e.ctrlKey === true) {this.panelToogle('left')}

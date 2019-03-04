@@ -1,11 +1,16 @@
 <template>
-    <div class="table-wrapper">
-        <div class="table-plus">
+    <div class="structure">
+        <app-table 
+            v-for="(root, index) of getSEMD.structure" 
+            :key="index"
+            :root="root"
+        />
+        <!-- <div class="table-plus">
             <button @click.prevent class="table-plus-button">
                 <font-awesome-icon icon="plus" size="2x"/>
             </button>
-        </div>
-        <div class="wrapper">
+        </div> -->
+        <!-- <div class="wrapper">
             <div class="header">
                 <div class="left">
                     <div>Мастер-таблица</div>
@@ -17,31 +22,34 @@
                 <button class="trash-button"><font-awesome-icon icon="trash"/></button>
             </div>
             <app-table/>
-        </div>
-        
+        </div> -->
+        <!-- {{getSEMD}} -->
     </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import AppTable from '@/components/SEMDTable.vue';
+import { mapGetters } from 'vuex';
 
-@Component({ components: { AppTable }})
-export default class SEMDTable extends Vue {}
+@Component({ 
+    components: { AppTable },
+    computed: {...mapGetters('SEMD', ['getSEMD'])}
+})
+export default class SEMDStructure extends Vue {
+    public getSEMD!: any;
+}
 </script>
 
 
 <style lang="scss" scoped>
 
-    .table {  
-        &-wrapper {
-            display: flex;
-            width: 100%;
-            // height: 200px;
-            // background-color: #b3b3b3;
-            box-sizing: border-box; 
-            padding: 5px;
-        }
+    .structure {  
+        width: 100%;
+        // height: 200px;
+        // background-color: #b3b3b3;
+        box-sizing: border-box; 
+        padding: 5px;
 
         &-plus {
             width: 80px;

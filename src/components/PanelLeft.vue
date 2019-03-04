@@ -29,7 +29,7 @@ export default class LeftAsidePanel extends Vue {
    public resize(this: any): void {
       const that: any = this;
       const rightPanel: Element = this.$el.parentNode.querySelector('#panel-right');
-      const maxWidth: number = window.innerWidth - rightPanel.clientWidth;
+      const maxWidth: number = window.innerWidth - (rightPanel ? rightPanel.clientWidth : 0);
       let emitWidth;
 
       function move(e: MouseEvent): void {
