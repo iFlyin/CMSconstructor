@@ -16,7 +16,8 @@
             <panel-footer :height="panel.footer" :width="canvasWidth + panel.right" @resize="panelResize({dir: 'footer', val: $event})" v-if="init">
                 <text-editor/>
             </panel-footer>
-        </div> 
+        </div>
+        <modal-box v-if="ModalBox"></modal-box>
     </div>
 </template>
 
@@ -32,9 +33,10 @@ import SemdLayout   from '@/components/SEMDLayout.vue';
 import TextEditor   from '@/components/SEMDTextEditor.vue';
 import AppConfig    from '@/components/SEMDConfig.vue';
 import AppList      from '@/components/SEMDList.vue';
+import ModalBox     from '@/components/PanelModalBox.vue';
 
 @Component({
-    components: { MainMenu, PanelLeft, PanelRight, PanelFooter, PanelCanvas, SemdLayout, TextEditor, AppConfig, AppList }, 
+    components: { MainMenu, PanelLeft, PanelRight, PanelFooter, PanelCanvas, SemdLayout, TextEditor, AppConfig, AppList, ModalBox}, 
     computed: {
         ...mapGetters('SEMD', {
             init: 'getInitStatus',
@@ -61,6 +63,7 @@ export default class SEMD extends Vue {
     private init!: any;
     private getSEMDs!: any;
     private getSEMDbyID!: any;
+    public ModalBox: boolean = false;
 
 
     private get canvasWidth(): number {
@@ -88,6 +91,8 @@ export default class SEMD extends Vue {
         //   this.clearHistory();
         }
     }
+
+    public select() {}
 
     public created(): void {
         this.getSEMDs();

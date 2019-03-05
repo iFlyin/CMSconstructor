@@ -10,8 +10,8 @@
         <ul class="tree-list">
             <li v-for="SEMD of getList" :key="SEMD.id" class="tree-list-item" @click="$emit('select', SEMD.id)">
                 <div class="tree-list-item-id">{{SEMD.id}}</div>
-                <div class="tree-list-item-name">{{SEMD.name}}</div>
-                <div class="tree-list-item-icon">
+                <div class="tree-list-item-name" :title="SEMD.description">{{SEMD.name}}</div>
+                <!-- <div class="tree-list-item-icon">
                     <font-awesome-icon 
                         class="search-icon" 
                         :icon="SEMD.has_filters ? 'check-square' : 'square'"
@@ -22,7 +22,7 @@
                         :icon="SEMD.internal_semd ? 'check-square' : 'square'"
                         :title="`internal_semd = ${SEMD.internal_semd}`"
                     />
-               </div>
+               </div> -->
             </li>
         </ul>
     </div>
@@ -35,12 +35,17 @@ import { Vue, Component } from 'vue-property-decorator';
 export default class Tree extends Vue {
     public list!: any[];
 
+    public get semds(): any[] {
+        return this.list.filter((el: any) => el.title_semd === true);
+    }
+
     public filter: any = '';
 
     public get getList(): any[] {
         const regexp: RegExp = new RegExp(this.filter, 'i');
-        return this.list.filter((el: any) => regexp.test(el.name));
+        return this.semds.filter((el: any) => regexp.test(el.name));
     };
+
 }
 </script>
 

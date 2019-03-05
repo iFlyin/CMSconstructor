@@ -58,10 +58,15 @@ export default {
         getSEMDs(state: State): SEMD[] { return state.semds; },
         getSEMD(state: State): any { return state.semd; },
         getPanel(state: State): Panel { return state.panel; },
+        getName: (state: State) => (id: string): string => {
+            console.log(id);
+            return state.semds.filter((el: any) => el.id == id)[0].name;
+        },
     },
     mutations: {
         // setInitFalse(state: State): void { state.init = false; },
         newSEMD(state: State): void {
+            state.semd = new Object();
             state.init = true;
         },
         closeProject(state: State) {
@@ -74,13 +79,10 @@ export default {
             state.semds = payload;
         },
         setSEMD(state: State, payload: any) {
-            // console.log(JSON.parse(payload));
-            // console.log(payload);
-            if (payload.structure) {
-                payload.structure = JSON.parse(payload.structure);
+            if (payload.data_structure) {
+                payload.data_structure = JSON.parse(payload.data_structure);
             }
             state.semd = payload;
-            // console.log(state.semd)
         },
         panelResize(state: State, payload: PanelResize): void {
             Vue.set(state.panel, payload.dir, payload.val);
@@ -98,8 +100,8 @@ export default {
         getSEMDbyID: async (context: any, payload: number) => {
             try {
                 // удалить тестовую строчку
-                const payload = 102;
-                const {data} = await http.get(`get/get_single_semd?id=${payload}`);
+                // const payload = 102;
+                const {data} = await http.get(`get/get_semds?id=${payload}`);
                 // console.log(data);
                 context.commit('setSEMD', data[0]);
                 if(context.state.init === false) {

@@ -8,7 +8,7 @@
                   <a class="menu-list-item-link" @click="$emit('newproject')">{{cfg.new}}</a>
                </li>
                <li class="menu-list-item">
-                  <a class="menu-list-item-link" @click.stop>{{cfg.save}}</a>
+                  <a class="menu-list-item-link" @click="reload()">{{cfg.save}}</a>
                </li>
                <li class="menu-list-item">
                   <a class="menu-list-item-link" @click.stop>{{cfg.saveFile}}</a>
@@ -152,6 +152,10 @@ export default class CMSMenu extends Vue {
    private beforeDestroy(): void { 
       document.removeEventListener('keyup', this.keyUpListner);
       document.removeEventListener('keydown', this.fixPrevent, false);
+   }
+
+   private reload(): void {
+      location.reload();
    }
 }
 </script>
