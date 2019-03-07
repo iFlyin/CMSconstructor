@@ -94,7 +94,7 @@ export default class CMSMenu extends Vue {
    private close() {
       const req: boolean = confirm('Все несохраненные данные будут утерены. Вы действительно хотите выйти?');
       if (req) {
-         this.$router.push({ path: '/' });
+         // this.$router.push({ path: '/' });
          this.cleanState();
          this.clearHistory();
          this.panelResize({dir: 'left', val: 0});

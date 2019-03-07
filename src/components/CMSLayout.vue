@@ -190,11 +190,13 @@ export default class LayoutBL extends Vue {
    .layout {
         min-width: 100%;
         min-height: 100%;
-         display: flex;
+        display: flex;
         z-index: 1;
         position: relative;
         outline: none;
-         overflow: auto;
+        overflow: auto;
+        // box-sizing: border-box;
+        // margin: 5px;
     }
 
    .line-container {

@@ -1,10 +1,10 @@
 <template>
   <div class="home">
-    <router-link to="/"><img alt="ИМЦ логотип" src="../assets/logo.png"></router-link>
+    <a href="#"><img alt="ИМЦ логотип" src="../assets/logo.png"></a>
     <div id="nav">
-      <router-link to="/SEMD">Документы</router-link> |
-      <router-link class="disabledLink" to="/">Формы</router-link> |
-      <router-link to="/CMS">Процессы</router-link>
+      <a @click="$emit('route', 'app-semd')">Документы</a> |
+      <a class="disabledLink" to="/">Формы</a> |
+      <a @click="$emit('route', 'app-cms')">Процессы</a>
     </div>
   </div>
 </template>
@@ -29,6 +29,8 @@ export default class Home extends Vue {}
     a {
       font-weight: bold;
       color: $colorDark;
+      cursor: pointer;
+      user-select: none;
       
       &:hover {
         color: $colorGreen;
@@ -37,7 +39,7 @@ export default class Home extends Vue {}
   }
 
   .disabledLink {
-    cursor: not-allowed;
+    cursor: not-allowed !important;
   }
 </style>
 

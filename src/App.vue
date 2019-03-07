@@ -1,8 +1,39 @@
 <template>
-  <div id="app">
-    <router-view/>
-  </div>
+	<div id="app">
+		<components :is="page" @route="route($event)"/>
+	<!-- <router-view/> -->
+	</div>
 </template>
+
+<script lang="ts">
+import { Vue, Component } from 'vue-property-decorator';
+import { mapGetters, mapMutations } from 'vuex';
+import AppHome from '@/views/Home.vue';
+import AppCms from '@/views/CMS.vue';
+import AppSemd from '@/views/SEMD.vue';
+
+@Component({
+  	components: {
+    	AppHome, AppCms, AppSemd,
+	  },
+	  computed: { ...mapGetters({
+		  page: 'getPage',
+	  })},
+	  methods: { ...mapMutations({
+		  setPage: 'setPage',
+	  })}
+})
+
+export default class App extends Vue {
+  public page!: string;
+  public setPage!: any;
+  
+  public route(e: string) {
+	  this.setPage(e);
+  }
+}
+</script>
+
 
 <style lang="scss">
 html, body {

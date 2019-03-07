@@ -14,7 +14,8 @@
                 <div class="layout-cms-id" :style="{'border-width' : 1 / zoom + 'px'}" v-html="item.props.id"/>
                 <div class="layout-cms-name" v-html="item.props.name"/>
                 <div class="layout-cms-gn" :style="{'border-width' : 1 / zoom + 'px'}">
-                    <input type="number" class="gn-input" min="1" max="999" :value="groupNumber">
+                    <!-- <input type="number" class="gn-input" min="1" max="999" :value="groupNumber"> -->
+                    <gn-selector :value="groupNumber" @set="setGroupNum($event)"/>  
                 </div>
                 <div class="element-resize" @mousedown.stop="resize($event)"/>
             </div>
@@ -42,6 +43,7 @@ import { mapGetters, mapMutations } from 'vuex';
 import { snapshot} from '@/mixins';
 // заменить на универсальный!!!
 import ElSelect from '@/components/CMSSelect.vue';
+import GnSelector from '@/components/CMSGnSelector.vue';
 
 // вынести в файл интерфейсов
 interface cmsStyle {
@@ -53,7 +55,7 @@ interface cmsStyle {
 }
 
 @Component({
-    components: { ElSelect },
+    components: { ElSelect, GnSelector },
     props: { item: { type: Object, required: true, } },
     mixins: [ snapshot ],
     computed: {
@@ -75,6 +77,7 @@ interface cmsStyle {
             select: 'setSelected',
             setXY: 'setXY',
             setGN: 'setValue',
+            setCMSwidth: 'setCMSwidth',
         }),
     },
 })
@@ -88,6 +91,7 @@ export default class CMSElement extends Vue {
     public cmsList!: any;
     public screenList!: any;
     public setGN!: any;
+    public setCMSwidth!: any;
 
     public saveSnapshot!: any;
 
@@ -100,22 +104,18 @@ export default class CMSElement extends Vue {
     public lookName!: any;
 
     public get groupNumber(): number {
-        console.log('get');
-        return this.item.props.group_number;
+        return parseInt(this.item.props.group_number);
     }
 
-    public set groupNumber(v: number) {
-        console.log('set');
-        this.setGN({
-            v: v,
-            key: 'group_number',
-            id: this.item.props.id,
-            callback: this.saveSnapshot,
-        })
-    }
-
-    public console() {
-        console.log('change');
+    public setGroupNum(v: number) {
+        if (v >= 1) {
+            this.setGN({
+                v: v,
+                key: 'group_number',
+                id: this.item.props.id,
+                callback: this.saveSnapshot,
+            })
+        }
     }
 
     public get isSelected(): boolean { return this.item.props.id === this.selected; }
@@ -191,30 +191,23 @@ export default class CMSElement extends Vue {
         function onResize(e: MouseEvent) {
             const path = that.cmsList[index].params;
             const move = that.item.params.width + e.movementX / that.zoom;
-
             const maxX = parent.width - thatX - (4 / that.zoom) - 2;
-            console.log(maxX)
             if (move <= 180) {
-                that.item.params.width = 180;
-                // переписать на Vuex
+                that.setCMSwidth({
+                    val: 180,
+                    id: that.item.props.id,
+                })
             } else if ( move > maxX) {
-                that.item.params.width = maxX;
+                that.setCMSwidth({
+                    val: maxX,
+                    id: that.item.props.id,
+                })
             } else {
-                that.item.params.width = move;
+                that.setCMSwidth({
+                    val: move,
+                    id: that.item.props.id,
+                })
             }
-                // ? that.item.params.width = 180
-                // : that.item.params.width = move;
-            // that.item.params.width += e.movementX / that.zoom;
-                
-            // const newX = (e.clientX - that.panel.left) / that.zoom + scrollX;
-            // const newY = (e.clientY - 30) / that.zoom + scrollY;
-            // const minWidth = parent.minWidth;
-            // const minHeight = parent.minHeight;
-            // const moveX = e.movementX / that.zoom;
-            // const moveY = e.movementY / that.zoom;
-
-        
-            // if (path.width + moveX > minWidth) { path.width += moveX; } else { path.width =  minWidth; }
         }   
 
         function clean(this: any, e: MouseEvent) {
@@ -260,8 +253,6 @@ export default class CMSElement extends Vue {
         overflow: hidden;
         display: flex;
         justify-content: center;
-        min-height: 40px;
-        // max-height: 80px;
         padding: 10px;
         cursor: move;
         user-select: none;
@@ -289,7 +280,7 @@ export default class CMSElement extends Vue {
         display: flex;
         justify-content: center;
         align-items: center;
-        padding: 5px;
+        // padding: 5px;
         border-left: 1px solid $colorDark;
     }
 

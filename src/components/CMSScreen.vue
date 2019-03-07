@@ -140,10 +140,9 @@ export default class CMSScreen extends Vue {
    private get minWidth(): number {
       let minWidth = 300;
       for (const child of this.childsList) {
-         const childMaxX = child.params.X + 160 + (10 * this.zoom);
+         const childMaxX = child.params.X + child.params.width + (6 * this.zoom);
          if (childMaxX > minWidth) { minWidth = childMaxX; }
       }
-      // console.log(minWidth);
       return minWidth;
    }
 
@@ -156,7 +155,6 @@ export default class CMSScreen extends Vue {
             if (childMaxY > minHeight) { minHeight = childMaxY; }
          }
       }
-      // console.log(minHeight);
       return minHeight;
    }
 
@@ -166,7 +164,6 @@ export default class CMSScreen extends Vue {
       return result;
    }
 
-    // убрать ошибки!!!
    private get lines(): any[] {
       //ЦМС соответствует экран!
       const childWithEffect = this.childsList.filter(el => {
@@ -328,18 +325,6 @@ export default class CMSScreen extends Vue {
    private lineConstructor(x1: number, y1: number, x2: number, y2: number): string {
       return `M${x1},${y1}L${x2},${y2}`
    }
-
-   // private mounted() {
-   //    const that = this;
-   //    this.el = this.$el.firstChild;
-   //    this.el.addEventListener('wheel', function(this: any, e: any) {
-   //      if(this.offsetHeight < that.minHeight) {
-   //       //   добавить функцию задающию размер!!!
-   //          // that.item.params.height = that.minHeight;
-   //          console.log('бум!');
-   //      };
-   //    })
-   // }
 }
 </script>
 

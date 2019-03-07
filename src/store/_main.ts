@@ -7,6 +7,7 @@ import createPersistedState from 'vuex-persistedstate';
 Vue.use(Vuex);
 
 interface State {
+  page: string;
   panel: Panel;
 }
 
@@ -25,6 +26,7 @@ export default new Vuex.Store({
   plugins: [createPersistedState()],
   modules: { CMS, SEMD },
   state: {
+    page: 'app-home',
     panel: {
       left: 0,
       right: 0,
@@ -33,10 +35,14 @@ export default new Vuex.Store({
   },
   getters: {
     getPanel(state: State): Panel { return state.panel; },
+    getPage(state: State) { return state.page; },
   },
   mutations: {
     panelResize(state: State, payload: PanelResize): void {
       Vue.set(state.panel, payload.dir, payload.val);
+    },
+    setPage(state: State, payload: string): void {
+      state.page = payload;
     },
   },
 });

@@ -18,10 +18,11 @@ export default class SEMDLayout extends Vue {}
 
 <style lang="scss" scoped>
     .layout {
+        // box-sizing: border-box;
         // width: 100%;
         height: 100%;
         // background-color: #fff;
-        padding: 2px;
+        // padding: 2px;
         // overflow: auto;
     }
 

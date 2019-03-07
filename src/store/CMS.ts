@@ -116,11 +116,11 @@ export default {
          },
          gui_icon: {
             desc: 'Наименование ресурса веб-приложения, соответствующего иконке элемента',
-            type: 'el-select',
+            type: 'el-imagepicker',
          },
          check_right: {
             desc: 'Код права, наличие которого у пользователя, разрешает доступ к данному веб-элементу',
-            type: 'el-select',
+            type: 'el-input-number',
          },
       },
       prop_default: {
@@ -139,6 +139,63 @@ export default {
          check_right: null,
       },
       loading: false,
+      images: [
+         'images/Accept.png',
+         'images/actions.png',
+         'images/Add_ico.png',
+         'images/Administrator.png',
+         'images/AIS-client.png',
+         'images/Akt_vyverki.png',
+         'images/Alerts_sprite.png',
+         'images/Apply.png',
+         'images/arrow_down.png',
+         'images/arrow_left.png',
+         'images/arrow_right.png',
+         'images/arrow_up.png',
+         'images/arrow_up1.png',
+         'images/Automate_ico.png',
+         'images/AvtomatMEK.png',
+         'images/Background_clouds.jpg',
+         'images/Background.jpg',
+         'images/button_gradient.png',
+         'images/Calendar.png',
+         'images/Cancel.png',
+         'images/Cancel1.png',
+         'images/Cancel2.png',
+         'images/Cancel3.png',
+         'images/Celevye_MEE-EKMP.png',
+         'images/Checkbox_sprite.png',
+         'images/clear_text.png',
+         'images/Client-action-time.png',
+         'images/Client-action.png',
+         'images/client-AIS-action.png',
+         'images/close.png',
+         'images/close2.png',
+         'images/close3.png',
+         'images/Delete_old.png',
+         'images/delete.png',
+         'images/Disp_vzros.png',
+         'images/Disp.png',
+         'images/divide.png',
+         'images/Documents_stat.png',
+         'images/Documents.png',
+         'images/Documenty.png',
+         'images/DopMEK-MEE-EKMP.png',
+         'images/ESSA_otchet.png',
+         'images/Failovy_obmen.png',
+         'images/favicon.png',
+         'images/favicon2.png',
+         'images/female.png',
+         'images/Filter_All.png',
+         'images/Filter_Gender.png',
+         'images/Filter_Sector.png',
+         'images/Filter_sprite.png',
+         'images/FinKontrol.png',
+         'images/Flag_sprite.png',
+         'images/gender_filter.png',
+         'images/Gender-age_sprite.png',
+         'images/Gosp.png',
+      ],
    },
    getters: {
       getInitStatus(state: any) { return state.init; },
@@ -169,6 +226,7 @@ export default {
             : 'Не задан';
       },
       getLoading(state: any) { return state.loading; },
+      getImages(state: any) { return state.images; },
    },
    mutations: {
       setID(state: any, payload: any): void {
@@ -330,6 +388,11 @@ export default {
          const cms = state.cmsList[index];
          cms.props[key] = value;
          payload.callback();
+      },
+      setCMSwidth(state: any, payload: any) {
+         const id = payload.id;
+         const val = payload.val;
+         state.cmsList.filter((el: any) => el.props.id === id)[0].params.width = val;
       },
       initNewProject(state: any) {
          state.init = true;

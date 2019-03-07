@@ -36,5 +36,7 @@ export default class Canvas extends Vue {}
       background-position: left top;
       background-attachment: fixed;
       overflow: hidden;
+      box-sizing: border-box;
+      padding: 2px;
    }
 </style>

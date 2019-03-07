@@ -16,6 +16,7 @@
             callback: saveSnapshot
          })"
       />
+      <!-- {{component}} -->
    </div>
 </template>
 
@@ -29,9 +30,10 @@ import ElInputNumber from './InputNumber.vue';
 import ElTextarea from './TextArea.vue';
 import ElDatepicker from './DatePicker.vue';
 import ElSelect from './Select.vue';
+import ElImagepicker from './ImagePicker.vue';
 
 @Component({
-   components: { ElReadonly, ElInput, ElTextarea, ElDatepicker, ElSelect, ElInputNumber },
+   components: { ElReadonly, ElInput, ElTextarea, ElDatepicker, ElSelect, ElInputNumber, ElImagepicker },
    props: {
       label: {
          type: String,

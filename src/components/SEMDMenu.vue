@@ -66,7 +66,7 @@ import CloseButton from '@/components/PanelCloseButton.vue';
    components: { CloseButton },
    mixins: [history],
    computed: {...mapGetters('SEMD', { init: 'getInitStatus', panels: 'getPanel' })},
-   methods: {...mapMutations('SEMD', {cleanState: 'closeProject', panelResize: 'panelResize'})},
+   methods: {...mapMutations('SEMD', {cleanState: 'closeProject', panelResize: 'panelResize'}), ...mapMutations({setPage: 'setPage'})},
 })
 export default class CMSMenu extends Vue {
    public cfg: any = configSEMD;
@@ -81,6 +81,7 @@ export default class CMSMenu extends Vue {
    public save!: any;
    public cleanState!: any;
    public init!: any;
+   public setPage!: any;
 
    public get left(): boolean {
       return this.panels.left > 2 
@@ -116,7 +117,7 @@ export default class CMSMenu extends Vue {
    private close() {
       const req: boolean = confirm('Все несохраненные данные будут утерены. Вы действительно хотите выйти?');
       if (req) {
-         this.$router.push({ path: '/' });
+         this.setPage('app-home');
          this.cleanState();
          this.clearHistory();
          this.panelResize({dir: 'left', val: 320});
