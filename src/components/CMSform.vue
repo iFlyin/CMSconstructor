@@ -1,7 +1,7 @@
 <template>
    <form class="cms-form">
       <app-input 
-         v-for="(item, key, index) of paramsList" :key="index"
+         v-for="(item, key, index) of params" :key="index"
          :label="key"
          :component="item.type"
          :cms="CMS"
@@ -13,37 +13,35 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { mapGetters } from 'vuex';
-import AppInput from './inputs/Label.vue';
+import AppInput from '@/components/inputs/Label.vue';
+import { CMS, PropType } from '@/interfaces';
 @Component({
    components: { AppInput },
    computed: {...mapGetters('CMS', { 
-      paramsList: 'getPropList',
+      params: 'getPropList',
       checkSelected: 'getSelectedType',
       selected: 'getSelected',
       cmsList: 'getCMSlist',
    })}
 })
-export default class CMSForm extends Vue {
-   private paramsList!: any;
-   private checkSelected!: string;
-   private selected!: number;
-   private cmsList!: any[];
 
-   private get CMS() :any {
+export default class CMSForm extends Vue {
+   private params!: PropType;
+   private selected!: number;
+   private checkSelected!: string;
+   private cmsList!: CMS[];
+
+   private get CMS(): CMS | object {
       const type: string = this.checkSelected;
       const id: number = this.selected;
       if (type === 'CMS') {
-         const index = this.cmsList.findIndex((el: any) => el.props.id === id);
+         const index = this.cmsList.findIndex((el: CMS) => el.props.id === id);
          return index !== -1 
             ? this.cmsList[index]
             : {};
       } else {
          return {};
       }
-   }
-
-   private change(): void {
-      console.log('change');
    }
 }
 </script>

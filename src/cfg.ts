@@ -1,3 +1,4 @@
+// убрать в миксин
 interface Config {
     file: string;
     edit: string;
@@ -48,3 +49,20 @@ export const configSEMD: Config = {
     rightPanel: 'Правая панель',
     footer: 'Нижняя панель',
 };
+
+export const configFORM: Config = {
+    file: 'Файл',
+    edit: 'Правка',
+    view: 'Вид',
+    new: 'Новый проект',
+    load: 'Загрузить проект',
+    save: 'Сохранить',
+    saveFile: 'Cохранить в файл',
+    loadFile: 'Загрузить из файла',
+    exit: 'Выход',
+    undo: 'Отменить',
+    redo: 'Повторить',
+    leftPanel: 'Левая панель',
+    rightPanel: 'Правая панель',
+    footer: 'Нижняя панель',
+}

@@ -1,11 +1,64 @@
+import Vue from 'vue';
 import http from './axios';
 import intersect from 'path-intersection';
+import {
+   Panel,
+   Selected,
+   Screen,
+   CMS,
+   WebLook,
+   WebEffect,
+   NumValue,
+   PropType,
+   Props,
+   SetZoom,
+   PanelResize,
+   AddCMS,
+   SetCMSeffect,
+   SetValue,
+   SetCMSwidth,
+   ExtraProps,
+   FileLoad,
+   GetWebLook,
+   GetWebEffect,
+   GetCMSbyID,
+   GetCMSlist,
+   SetPosition,
+} from '@/interfaces';
 // import { weblook, webeffect } from './localhost';
+
+interface State {
+   init: boolean;
+   panel: Panel;
+   systems_id: string;
+   selected: Selected;
+   id: number;
+   zoom: number;
+   loading: boolean;
+   screenList: Screen[];
+   cmsList: CMS[];
+   deleteList: number[];
+   weblook: WebLook[];
+   webeffect: WebEffect[];
+   effect2screen: NumValue;
+   look2screen: NumValue;
+   prop_type: PropType;
+   prop_default: Props;
+   images: string[];
+
+   // ЗАМЕНИТЬ!!!
+   systems_list: any;
+}
 
 export default {
    namespaced: true,
    state: {
       init: false,
+      panel: {
+         left: 0,
+         right: 0,
+         footer: 0,
+      },
       systems_list: [
          {
             uuid: '57f7d380-15bc-4bf4-9137-27182bb69826',
@@ -25,8 +78,10 @@ export default {
          },
       ],
       systems_id: 'New system',
-      selected: 0,
-      selectedType: 'none',
+      selected: {
+         id: 0,
+         type: 'none',
+      },
       id: 0,
       zoom: 1,
       screenList: new Array(),
@@ -48,6 +103,10 @@ export default {
          22: 'Экран поиска документа',
          24: 'Внутренний фрэйм',
          27: 'Экран просмотра документа',
+      },
+      look2screen: {
+         12: 'Дерево',
+         16: 'Контейнер с ячейками',
       },
       prop_type: {
          look: {
@@ -124,19 +183,19 @@ export default {
          },
       },
       prop_default: {
+         add_params: null,
+         check_right: null,
          d_start: null,
          f_fin: null,
          d_modif: null,
+         db_function_name: null,
+         db_function_params: null,
+         fields_list: null,
          name: null,
          fullname: null,
          description: null,
          group_number: 1,
-         db_function_name: null,
-         db_function_params: null,
-         fields_list: null,
          gui_icon: null,
-         add_params: null,
-         check_right: null,
       },
       loading: false,
       images: [
@@ -198,43 +257,43 @@ export default {
       ],
    },
    getters: {
-      getInitStatus(state: any) { return state.init; },
-      getSystemsList(state: any) { return state.systems_list; },
-      getScreenList(state: any) { return state.screenList; },
-      getID(state: any) { return state.id; },
-      getZoom(state: any) {return state.zoom; },
-      getScreen(state: any) { return state.screen; },
-      getBlock(state: any) { return state.block; },
-      getWebLook(state: any) { return state.weblook; },
-      getWebEffect(state: any) { return state.webeffect; },
-      getCMSlist(state: any) { return state.cmsList; },
-      getProp(state: any) { return state.prop_default; },
-      getPropList(state: any) { return state.prop_type; },
-      getSelected(state: any) { return state.selected; },
-      getSelectedType(state: any) { return state.selectedType; },
-      getSystemID(state: any) { return state.systems_id; },
-      getLookName: (state: any) => (id: number) => {
+      getInitStatus(state: State): boolean { return state.init; },
+      getPanel(state: State): Panel { return state.panel; },
+      getZoom(state: State): number {return state.zoom; },
+      getScreenList(state: State): Screen[] { return state.screenList; },
+      getCMSlist(state: State): CMS[] { return state.cmsList; },
+      getWebLook(state: State): WebLook[] { return state.weblook; },
+      getWebEffect(state: State): WebEffect[] { return state.webeffect; },
+      getProp(state: State): Props { return state.prop_default; },
+      getPropList(state: State): PropType { return state.prop_type; },
+      getSelected(state: State): number { return state.selected.id; },
+      getSelectedType(state: State): string { return state.selected.type; },
+      getSystemID(state: State): string { return state.systems_id; },
+      getLookName: (state: State) => (id: number): string => {
          const index = state.weblook.findIndex((el: any) => el.id === id);
          return (index > -1)
             ? state.weblook[index].name
             : 'Без внешнего вида';
       },
-      getEffectName: (state: any) => (id: number) => {
+      getEffectName: (state: State) => (id: number): string => {
          const index = state.webeffect.findIndex((el: any) => el.id === id);
          return (index > -1)
             ? state.webeffect[index].name
             : 'Не задан';
       },
-      getLoading(state: any) { return state.loading; },
-      getImages(state: any) { return state.images; },
+      getLoading(state: State): boolean { return state.loading; },
+      getImages(state: State): string[] { return state.images; },
+      // поменять
+      getSystemsList(state: State): any { return state.systems_list; },
+      getID(state: State): number { return state.id; },
    },
    mutations: {
-      setID(state: any, payload: any): void {
-         state.id = payload;
+      panelResize(state: State, payload: PanelResize): void {
+         Vue.set(state.panel, payload.dir, payload.val);
       },
-      setZoom(state: any, payload: any): void {
-         const clearZoom = Math.round((state.zoom * 10));
-         const event = payload.e;
+      setZoom(state: State, payload: SetZoom): void {
+         const clearZoom: number = Math.round((state.zoom * 10));
+         const event: WheelEvent = payload.e;
 
          if (event.deltaY > 0) {
             if (clearZoom === 3) {
@@ -252,51 +311,41 @@ export default {
             }
          }
       },
-      add2screenList(state: any, payload: any): void {
+      loadTrue(state: State): void { state.loading = true; },
+      loadFalse(state: State): void { state.loading = false; },
+      add2screenList(state: State, payload: Screen): void {
          state.screenList.push(payload);
       },
-      add2cmsList(state: any, payload: any): void {
+      add2cmsList(state: State, payload: AddCMS): void {
          state.cmsList.push(payload.item);
          payload.callback();
       },
-      delFromScreenList(state: any, payload: any): void {
+      delFromScreenList(state: State, payload: number): void {
          state.screenList.splice(payload, 1);
       },
-      deleteCMS(state: any, payload: any): void {
+      deleteCMS(state: State, payload: number): void {
          const id = state.cmsList[payload].props.id;
          state.deleteList.push(id);
          state.cmsList.splice(payload, 1);
       },
-      clearCMSeffect(state: any, payload: any): void {
-         const index = state.cmsList.findIndex((el: any) => el.props.id === payload);
-         if (index > -1) {state.cmsList[index].props.effect = ''; }
+      clearCMSeffect(state: State, payload: number): void {
+         const index = state.cmsList.findIndex((el: CMS) => el.props.id === payload);
+         if (index > -1) {state.cmsList[index].props.effect = null; }
       },
-      changeScreenId(state: any, payload: any): void {
-         const CMSindex = state.cmsList.findIndex((el: any) => el.props.id === payload.id);
-         const effect = state.cmsList[CMSindex].props.effect;
-
-         if (payload.value !== '') {
-            const index = state.screenList.findIndex((el: any) => el.props.id === payload.value);
-            const screen = state.screenList[index];
-            screen.props.id = payload.id;
-            screen.name = state.effect2screen[effect];
-         }
-      },
-      saveWebLook(state: any, payload: any) {
+      saveWebLook(state: State, payload: WebLook[]): void {
          state.weblook = payload;
       },
-      saveWebEffect(state: any, payload: any) {
+      saveWebEffect(state: State, payload: WebEffect[]): void {
          state.webeffect = payload;
       },
-      setCMSeffect(state: any, payload: any) {
-         // console.log(payload.id);
-         const CMSindex = state.cmsList.findIndex((el: any) => el.props.id === payload.id);
-         const CMSpath = state.cmsList[CMSindex];
+      setCMSeffect(state: State, payload: SetCMSeffect): void {
+         const CMSindex: number = state.cmsList.findIndex((el: CMS) => el.props.id === payload.id);
+         const CMSpath: CMS = state.cmsList[CMSindex];
          CMSpath.props.effect = payload.v;
-         const parentID = CMSpath.props.parent_id;
-         const fixParentID = (parentID) ? parentID : -1;
-         const parentIndex = state.screenList.findIndex((el: any) => el.props.id === fixParentID);
-         const parentPath = state.screenList[parentIndex];
+         const parentID: number | null = CMSpath.props.parent_id;
+         const fixParentID: number = (parentID) ? parentID : -1;
+         const parentIndex: number = state.screenList.findIndex((el: Screen) => el.props.id === fixParentID);
+         const parentPath: Screen = state.screenList[parentIndex];
          const parent = {
             X: parentPath.params.X,
             Y: parentPath.params.Y,
@@ -304,6 +353,7 @@ export default {
             H: parentPath.params.height,
          };
 
+         // tslint:disable-next-line:no-shadowed-variable
          const CMS = {
             X: CMSpath.params.X + parent.X,
             Y: CMSpath.params.Y + parent.Y,
@@ -316,28 +366,35 @@ export default {
             Y: CMS.Y + (CMS.H / 2),
          };
 
-         const path1 = rectConstructor(parent.X, parent.Y, parent.W, parent.H);
-         const path2 = lineConstructor(CMScenter.X, CMScenter.Y, CMScenter.X, CMScenter.Y + 10000);
+         const path1: string = rectConstructor(parent.X, parent.Y, parent.W, parent.H);
+         const path2: string = lineConstructor(CMScenter.X, CMScenter.Y, CMScenter.X, CMScenter.Y + 10000);
 
-         let X = ((CMScenter.X - 200) > 0) ? (CMScenter.X - 200) : 0;
-         let Y = intersect(path1, path2)[0].y + 100;
-         const effect = CMSpath.props.effect;
-         const check = state.effect2screen.hasOwnProperty(effect);
-         // добавить луки и add params!!!
+         let X: number = ((CMScenter.X - 200) > 0) ? (CMScenter.X - 200) : 0;
+         let Y: number = intersect(path1, path2)[0].y + 100;
+         const effect: number | null = CMSpath.props.effect;
+         const look: number | null = CMSpath.props.look;
 
-         const childIndex = state.screenList.findIndex((el: any) => el.props.id === payload.id);
+         const childIndex: number = state.screenList.findIndex((el: Screen) => el.props.id === payload.id);
 
          if (childIndex !== -1) {
             X = state.screenList[childIndex].params.X;
             Y = state.screenList[childIndex].params.Y;
             clear(payload.id);
          }
+         if (effect !== null) {
+            const check: boolean = effect in state.effect2screen;
+            if (check) { newScreen(state.effect2screen[effect]); }
+         }
+         if (look !== null) {
+            const check: boolean = look in state.look2screen;
+            if (check) { newScreen(state.look2screen[look]); }
+         }
 
-         if (check) {
-            const newScreen = {
+         function newScreen(name: string): void {
+            const screen: Screen = {
                props: {
                   id: payload.id,
-                  name: state.effect2screen[effect],
+                  name,
                },
                params: {
                   type: 'Screen',
@@ -347,10 +404,12 @@ export default {
                   height: 300,
                },
             };
-            state.screenList.push(newScreen);
+            state.screenList.push(screen);
          }
 
-         if (payload.callback) { payload.callback(); }
+         if (payload.callback) {
+            payload.callback();
+         }
 
          function rectConstructor(x: number, y: number, w: number, h: number): string {
             return `M${x},${y}L${x + w},${y}L${x + w},${y + h}L${x},${y + h}Z`;
@@ -360,44 +419,48 @@ export default {
             return `M${x1},${y1}L${x2},${y2}`;
          }
 
-         function clear(id: any) {
-            const list = state.cmsList.filter((el: any) => el.props.parent_id === id);
+         function clear(id: number) {
+            const list = state.cmsList.filter((el: CMS) => el.props.parent_id === id);
             if (list.length > 0) {
                for (const child of list) {
                   clear(child.props.id);
-                  // const childIndex = state.cmsList.findIndex((el: any) => el.props.id === child.props.id);
-                  state.cmsList.splice(state.cmsList.findIndex((el: any) => el.props.id === child.props.id), 1);
+                  state.cmsList.splice(state.cmsList.findIndex((el: CMS) => el.props.id === child.props.id), 1);
                }
             }
-            const newIndex = state.screenList.findIndex((item: any) => item.props.id === id);
+            const newIndex = state.screenList.findIndex((item: Screen) => item.props.id === id);
             if (newIndex !== -1) {
                state.screenList.splice(newIndex, 1);
             }
          }
       },
-      setSelected(state: any, payload: any) {
-         state.selected = payload.id;
-         state.selectedType = payload.type;
-         // const index = state.cmsList.findIndex((cms: any) => cms.props.id == payload.id);
-         // console.log(state.cmsList[index]);
+      setSelected(state: State, payload: Selected): void {
+         state.selected.id = payload.id;
+         state.selected.type = payload.type;
       },
-      setValue(state: any, payload: any) {
-         const key = payload.key;
-         const value = payload.v;
-         const index = state.cmsList.findIndex((item: any) => item.props.id === payload.id);
-         const cms = state.cmsList[index];
-         cms.props[key] = value;
+      setValue(state: State, payload: SetValue): void {
+         const key: string = payload.key;
+         const value: string | number | null = payload.v;
+         const index: number = state.cmsList.findIndex((item: CMS) => item.props.id === payload.id);
+         const cms: CMS = state.cmsList[index];
+         Vue.set(cms.props, key, value);
          payload.callback();
       },
-      setCMSwidth(state: any, payload: any) {
-         const id = payload.id;
-         const val = payload.val;
-         state.cmsList.filter((el: any) => el.props.id === id)[0].params.width = val;
+      setPosition(state: State, payload: SetPosition) {
+         const index: number = state.cmsList.findIndex((item: CMS) => item.props.id === payload.id);
+         const cms: CMS = state.cmsList[index];
+         Vue.set(cms.params, 'X', payload.x);
+         Vue.set(cms.params, 'Y', payload.y);
+         payload.callback();
       },
-      initNewProject(state: any) {
+      setCMSwidth(state: State, payload: SetCMSwidth): void {
+         const id: number = payload.id;
+         const val: number = payload.val;
+         state.cmsList.filter((el: CMS) => el.props.id === id)[0].params.width = val;
+      },
+      initNewProject(state: State): void {
          state.init = true;
          state.deleteList = new Array();
-         state.screenList.push({
+         const newScreen: Screen = {
             props: {
                id: -1,
                name: 'Главный экран',
@@ -409,31 +472,30 @@ export default {
                width: 400,
                height: 300,
             },
-         });
+         };
+         state.screenList.push(newScreen);
       },
-      closeProject(state: any) {
+      closeProject(state: State): void {
          localStorage.clear();
          state.init = false;
          state.deleteList = new Array();
          state.cmsList = new Array();
          state.screenList = new Array();
       },
-      clearAll(state: any) {
+      clearAll(state: State): void {
          state.systems_id = 'New system';
-         state.selected = 0;
+         state.selected.id = 0;
          state.zoom = 1;
-         state.selectedType = 'none';
+         state.selected.type = 'none';
          state.screenList = new Array();
          state.cmsList = new Array();
       },
-      setSystemId(state: any, payload: any) {
-         state.systems_id = payload;
-      },
-      pushAll(state: any, payload: any) {
-         (function pushNew(parentID: any) {
-            const CMS: any[] = payload.filter((el: any) => el.parent_id === parentID);
+      pushAll(state: State, payload: ExtraProps[]): void {
+         (function pushNew(parentID: number | null) {
+            // tslint:disable-next-line:no-shadowed-variable
+            const CMS: ExtraProps[] = payload.filter((el: ExtraProps) => el.parent_id === parentID);
             for (const CMSitem of CMS) {
-               const item = {
+               const item: CMS = {
                   params: {
                      type: 'CMS',
                      width: 180,
@@ -447,33 +509,34 @@ export default {
                pushNew(CMSitem.id);
             }
          })(null);
-         // console.log(state.cmsList)
       },
-      saveToFile(state: any, payload: any) {
-         // console.log(payload);
+      saveToFile(state: State, payload: HTMLElement): void {
          const json = {
             cms: state.cmsList,
             screen: state.screenList,
          };
-         const el = payload;
+         const el: HTMLElement = payload;
          const filename = 'obj.json';
          const blob = new Blob([JSON.stringify(json)], { type: 'application/json' });
          el.setAttribute('href', window.URL.createObjectURL(blob));
          el.setAttribute('download', filename);
          el.dataset.downloadurl = ['application/json', filename, window.URL.createObjectURL(blob)].join(':');
       },
-      loadFromFile(state: any, payload: any) {
-         const file = payload.file.target.files[0];
-         const reader = new FileReader();
-         reader.onload = (e: any) => {
-            const json = JSON.parse(e.target.result);
-            state.cmsList = json.cms;
-            state.screenList = json.screen;
-            payload.callback();
-         };
-         reader.readAsText(file);
+      loadFromFile(state: State, payload: FileLoad): void {
+         const file = payload.file.target.files ? payload.file.target.files[0] : null;
+         if ( file !== null) {
+            const reader = new FileReader();
+            reader.onload = (e: any) => {
+               const json = JSON.parse(e.target.result);
+               state.cmsList = json.cms;
+               state.screenList = json.screen;
+               payload.callback();
+            };
+            reader.readAsText(file);
+         }
       },
-      saveToService(state: any) {
+      saveToService(state: State): void {
+         // tslint:disable-next-line:no-shadowed-variable
          for (const CMS of state.cmsList) {
             const obj = JSON.stringify(CMS.props);
             const params = JSON.stringify({
@@ -486,30 +549,34 @@ export default {
          }
          // console.log(state.deleteList);
       },
-      loadTrue(state: any) { state.loading = true; },
-      loadFalse(state: any) { state.loading = false; },
+      // Поменять
+      setID(state: State, payload: number): void {
+         state.id = payload;
+      },
+      setSystemId(state: State, payload: string): void {
+         state.systems_id = payload;
+      },
    },
    actions: {
-      asyncGetLook: async (context: any) => {
+      asyncGetLook: async (context: any): Promise<any> => {
          try {
-            const {data} = await http.get('get/get_web_look_from_manual?manual=web_look');
+            const {data}: GetWebLook = await http.get('get/get_web_look_from_manual?manual=web_look');
             context.commit('saveWebLook', data);
          } catch (err) {
-            // console.log(err);
-            // context.commit('saveWebLook', weblook);
-            // console.log(weblook);
+            // tslint:disable-next-line:no-console
+            console.log(err);
          }
       },
-      asyncGetEffect: async (context: any) => {
+      asyncGetEffect: async (context: any): Promise<any> => {
          try {
-            const {data} = await http.get('get/get_web_effect_from_manual?manual=web_effect');
+            const {data}: GetWebEffect = await http.get('get/get_web_effect_from_manual?manual=web_effect');
             context.commit('saveWebEffect', data);
          } catch (err) {
-            // console.log(err);
-            // context.commit('saveWebEffect', webeffect);
+            // tslint:disable-next-line:no-console
+            console.log(err);
          }
       },
-      asyncGetID: async (context: any) => {
+      asyncGetID: async (context: any): Promise<any> => {
          try {
             const resp: any = await http.get('get/get_cms');
             const sortById: any[] = resp.data.sort((a: any, b: any) => {
@@ -519,31 +586,29 @@ export default {
                   return 1;
                } else {
                   return;
-                  // console.log("ошибка ID не могут быть равными")
                }
             });
             const length = sortById.length;
             const lastID = sortById[length - 1].id;
             context.commit('setID', lastID);
          } catch (err) {
-            // console.log(err);
+            // tslint:disable-next-line:no-console
+            console.log(err);
          }
       },
-      asyncGetCMSbyId: async (context: any, payload: any) => {
+      asyncGetCMSbyId: async (context: any, payload: GetCMSbyID): Promise<any> => {
          try {
             context.commit('loadTrue');
-            // console.log(context.state.loading);
             const id = payload.id;
             context.commit('clearAll');
-            const resp: any = await http.get(`/get/get_cms?systems_id=${id}`);
+            const {data}: GetCMSlist = await http.get(`/get/get_cms?systems_id=${id}`);
             context.commit('setSystemId', id);
             context.commit('initNewProject');
-            context.commit('panelResize', {dir: 'left', val: 250}, { root: true });
-            context.commit('panelResize', {dir: 'right', val: 320}, { root: true });
-            context.commit('pushAll', resp.data);
-            // console.log(resp.data);
-            const data = context.getters.getCMSlist;
-            for (const obj of data) {
+            context.commit('panelResize', {dir: 'left', val: 250});
+            context.commit('panelResize', {dir: 'right', val: 320});
+            context.commit('pushAll', data);
+            const cmsList = context.getters.getCMSlist;
+            for (const obj of cmsList) {
                context.commit('setCMSeffect', {
                   v: obj.props.effect,
                   id: obj.props.id,
@@ -551,17 +616,10 @@ export default {
             }
             payload.callback();
             context.commit('loadFalse');
-            // console.log(context.state.loading);
-            // clear();
-            // console.log(data);
          } catch (err) {
-            // console.log(err);
+            // tslint:disable-next-line:no-console
+            console.log(err);
          }
       },
-      // asyncGetImages: async (context: any, payload: any) => {
-      //    const url = 'http://172.16.1.48:9000/assets/images/';
-      //    const resp: any = await http.get(url);
-      //    console.log(resp);
-      // }
    },
 };

@@ -82,27 +82,42 @@ import { mapGetters, mapMutations } from 'vuex';
 import { history } from '@/mixins';
 import { configCMS } from '@/cfg';
 import CloseButton from '@/components/PanelCloseButton.vue';
+import { Panel, PanelResize } from '@/interfaces';
 
 @Component ({
    components: { CloseButton },
    mixins: [history],
-   computed: {...mapGetters('CMS', {systemsList: 'getSystemsList', init: 'getInitStatus'}), ...mapGetters({ panels: 'getPanel' })},
-   methods: {...mapMutations('CMS', {save: 'saveToFile', load: 'loadFromFile', upload: 'saveToService', cleanState: 'closeProject'}), ...mapMutations({panelResize: 'panelResize', setPage: 'setPage'})}
+   computed: {
+      ...mapGetters('CMS', {
+         systemsList: 'getSystemsList',
+         init: 'getInitStatus',
+         panels: 'getPanel'
+      })
+   },
+   methods: {...mapMutations('CMS', {
+      save: 'saveToFile',
+      load: 'loadFromFile', 
+      upload: 'saveToService',
+      cleanState: 'closeProject', 
+      panelResize: 'panelResize'
+   }), 
+   ...mapMutations({setPage: 'setPage'})}
 })
 export default class CMSMenu extends Vue {
-   public cfg: any = configCMS;
+   public cfg: any = configCMS;  // CFG
    public menuActive: boolean = false;
    public active: string = '';
-   public clearHistory!: any;
-   public panels!: any;
-   public panelResize!: any;
-   public undo!: any;
-   public redo!: any;
-   public upload!: any;
-   public save!: any;
-   public cleanState!: any;
-   public init!: any;
-   public setPage!: any;
+   public panels!: Panel;
+   public init!: boolean;
+
+   public clearHistory!: () => void;
+   public undo!: () => void;
+   public redo!: () => void;
+   public panelResize!: (payload: PanelResize) => void;
+   public upload!: () => void;
+   public save!: (payload: HTMLElement) => void;
+   public cleanState!: () => void;
+   public setPage!: (payload: string) => void;
 
    public get left(): boolean {
       return this.panels.left > 2 
@@ -128,7 +143,6 @@ export default class CMSMenu extends Vue {
    }
 
    private keyUpListner(e: KeyboardEvent): void {
-      console.log(e);
       if(e.code === 'KeyZ' && e.ctrlKey === true) {this.undo()}
       if(e.code === 'KeyY' && e.ctrlKey === true) {this.redo()}
       if(e.code === 'ArrowLeft' && e.ctrlKey === true) {this.panelToogle('left')}

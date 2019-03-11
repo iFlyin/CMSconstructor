@@ -30,3 +30,13 @@ export const colors = {
         colorGrey: 'grey',
     }),
 };
+
+export const menu = {
+    // computed: {
+    //     left(): boolean {
+    //         return this.panels.left > 2
+    //             ? true
+    //             : false;
+    //     },
+    // }
+};

@@ -3,7 +3,7 @@
     <a href="#"><img alt="ИМЦ логотип" src="../assets/logo.png"></a>
     <div id="nav">
       <a @click="$emit('route', 'app-semd')">Документы</a> |
-      <a class="disabledLink" to="/">Формы</a> |
+      <a @click="$emit('route', 'app-form')">Формы</a> |
       <a @click="$emit('route', 'app-cms')">Процессы</a>
     </div>
   </div>

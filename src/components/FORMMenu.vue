@@ -1,6 +1,6 @@
 <template>
     <div id="menu">
-        <nav @click="menuActive = !menuActive">
+        <nav>
             <div class="menu-container">
                 <input type="button" class="menu-text-button" :value="config.file" @mouseover="active='file'">
             </div>
@@ -11,75 +11,72 @@
                <input type="button" class="menu-text-button" :value="config.view" @mouseover="active='view'">
                <ul class="menu-list" v-show="menuActive && (active==='view')">
                     <a class="menu-list-item-link" @click="panelToogle('left')">
-                       <span>{{cfg.leftPanel}}</span><font-awesome-icon :icon="left?'eye':'eye-slash'"/>
+                       <span>{{config.leftPanel}}</span><font-awesome-icon :icon="left?'eye':'eye-slash'"/>
                     </a>
                     <a class="menu-list-item-link" @click="panelToogle('right')">
-                       <span>{{cfg.rightPanel}}</span><font-awesome-icon :icon="right?'eye':'eye-slash'"/>
+                       <span>{{config.rightPanel}}</span><font-awesome-icon :icon="right?'eye':'eye-slash'"/>
                     </a>
                     <a class="menu-list-item-link" @click="panelToogle('footer')">
-                       <span>{{cfg.footer}}</span><font-awesome-icon :icon="footer?'eye':'eye-slash'"/>
+                       <span>{{config.footer}}</span><font-awesome-icon :icon="footer?'eye':'eye-slash'"/>
                     </a>
                 </ul>
             </div>
         </nav>
-        <close-button @close="close()"/>
+        <close-button @close="close()"/>   
     </div>
 </template>
 
 <script lang="ts">
-import { Vue, Component } from 'vue-property-decorator';
-import { mapGetters, mapMutations } from 'vuex';
+import { Vue, Component} from 'vue-property-decorator';
+import { mapGetters, mapMutations  } from 'vuex';
 import { history } from '@/mixins';
-import { configSEMD } from '@/cfg';
+import { configFORM } from '@/cfg';
 import CloseButton from '@/components/PanelCloseButton.vue';
 
-@Component ({
+@Component({
     components: { CloseButton },
     mixins: [history],
-    props: {
-        parent: {
-            type: String,
-            required: true
-        },
+    computed: {
+        ...mapGetters('FORM', {
+            panels: 'getPanel',
+        })
     },
-    computed: {...mapGetters({ panels: 'getPanel' }), ...mapGetters('SEMD', { init: 'getInitStatus' })},
-    methods: {...mapMutations({panelResize: 'panelResize'}), ...mapMutations('SEMD', {cleanState: 'closeProject'})},
+    methods: {...mapMutations({setPage: 'setPage'})}
 })
 
-export default class CMSMenu extends Vue {
-   public config: any = configSEMD;
-   public menuActive: boolean = false;
-   public clearHistory!: any;
-   public active: string = '';
-   public panels!: any;
-   public panelResize!: any;
-   public undo!: any;
-   public redo!: any;
-   public upload!: any;
-   public save!: any;
-   public cleanState!: any;
-   public init!: any;
+export default class FormMenu extends Vue {
+    public config: any = configFORM;
+    public cleanState!: any;
+    public clearHistory!: any;
+    public menuActive: boolean = false;
+    public active: string = '';
+    public panels!: any;
+    public panelResize!: any;
+    public undo!: any;
+    public redo!: any;
+    public init!: any;
+    public setPage!: any;
 
-   public get left(): boolean {
+    public get left(): boolean {
       return this.panels.left > 2 
          ? true
          : false;
-   }
+    }
 
-   public get right(): boolean {
-      return this.panels.right > 2 
-         ? true
-         : false;
-   }
-   
-   public get footer(): boolean {
+    public get right(): boolean {
+        return this.panels.right > 2 
+            ? true
+            : false;
+    }
+
+     public get footer(): boolean {
       return this.panels.footer > 2 
          ? true
          : false;
    }
 
    public panelToogle(this: any, dir: string) {
-      if(this.init) {
+      if(this.init || dir === 'left') {
          this.panelResize({
             dir: dir,
             val: this[dir] ? 2 : dir === 'left'
@@ -91,51 +88,26 @@ export default class CMSMenu extends Vue {
       }
    }
 
-   private close() {
+
+
+    private close() {
       const req: boolean = confirm('Все несохраненные данные будут утерены. Вы действительно хотите выйти?');
       if (req) {
          // this.$router.push({ path: '/' });
-         this.cleanState();
+         this.setPage('app-home');
+        //  this.cleanState();
          this.clearHistory();
          this.panelResize({dir: 'left', val: 0});
          this.panelResize({dir: 'right', val: 0});
          this.panelResize({dir: 'footer', val: 0});
       }
    }
-
-   private keyUpListner(e: KeyboardEvent): void {
-      console.log(e);
-      if(e.code === 'KeyZ' && e.ctrlKey === true) {this.undo()}
-      if(e.code === 'KeyY' && e.ctrlKey === true) {this.redo()}
-      if(e.code === 'ArrowLeft' && e.ctrlKey === true) {this.panelToogle('left')}
-      if(e.code === 'ArrowRight' && e.ctrlKey === true) {this.panelToogle('right')}
-      if(e.code === 'ArrowDown' && e.ctrlKey === true) {this.panelToogle('footer')}
-      if(e.code === 'KeyS' && e.ctrlKey === true && e.shiftKey === true) {
-         const el: any = document.getElementById('save-to-file');
-         el.click();
-      }
-      if(e.code === 'KeyS' && e.ctrlKey === true && e.shiftKey !== true) {this.upload()}
-      
-   }
-
-   private fixPrevent(e: KeyboardEvent) {
-      if(e.code === 'KeyS' && e.ctrlKey === true) {e.preventDefault()}
-   }
-
-   private mounted(): void {
-      document.addEventListener('keyup', this.keyUpListner);
-      document.addEventListener('keydown', this.fixPrevent, false);
-   }
-
-   private beforeDestroy(): void { 
-      document.removeEventListener('keyup', this.keyUpListner);
-      document.removeEventListener('keydown', this.fixPrevent, false);
-   }
 }
 </script>
 
+
 <style lang="scss" scoped>
-   #menu {
+     #menu {
       position: relative;
       flex: 0 0 auto;
       box-sizing: border-box;
@@ -143,7 +115,7 @@ export default class CMSMenu extends Vue {
       align-items: center;
       width: 100%;
       height: 30px;
-      background-color: $colorGreen;
+      background-color: $colorDark;
       padding: 0 10px;
       z-index: 1000000;
    }
@@ -260,3 +232,4 @@ export default class CMSMenu extends Vue {
       display: none;
    }
 </style>
+

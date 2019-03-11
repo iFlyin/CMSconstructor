@@ -59,21 +59,14 @@ interface Card {
 
 @Component({
     components: { ModalBox, CloseButton },
-    props: {
-        val: {
-            default: null,
-        },
-    },
-    computed: {
-        ...mapGetters('CMS', { images: 'getImages'}),
-    }
+    props: { val: { default: null }},
+    computed: {...mapGetters('CMS', { images: 'getImages'})},
 })
 
 export default class ImagePicker extends Vue { 
     public val!: string;
     public ModalBox: boolean = false;
     public images!: string[];
-    // public size: string[] = new Array();
     public cards: Card[] = new Array();
     public selected: number = -1;
 
@@ -106,7 +99,7 @@ export default class ImagePicker extends Vue {
                 })
             })();
         }
-        console.log(this.cards)
+        // console.log(this.cards)
     }
 
     public get getSelected(): number {
@@ -129,12 +122,6 @@ export default class ImagePicker extends Vue {
     public get empty(): string {
         return require(`@/assets/not_found.jpg`);
     }
-
-    // public set selected(v: number | null) {
-
-    // }
-
-
 }
 </script>
 
@@ -163,8 +150,6 @@ export default class ImagePicker extends Vue {
                 max-width: 100%;
                 max-height: 100%;
                 height: auto;
-                // width: 180px;
-                // padding: 2px 2px;
                 box-sizing: border-box;
                 object-fit: cover;
             }
@@ -180,21 +165,17 @@ export default class ImagePicker extends Vue {
             flex: 1 1 auto;
             display: flex;
             flex-flow: column nowrap;
-            // padding: 2px;
             box-sizing: border-box;
             align-items: stretch;
             overflow: hidden;
         }
 
         &-name {
-            // flex: 1 1 auto;
             background-color: $colorDark;
-            // color: red;
             height: 33%;
             display: flex;
             justify-content: flex-start;
             align-items: center;
-            // word-break: break-all;
             padding: 5px;
             box-sizing: border-box;
             border: 2px solid #fff;
@@ -203,12 +184,10 @@ export default class ImagePicker extends Vue {
         
         &-size {
             background-color: $colorDark;
-            // color: red;
             height: 33%;
             display: flex;
             justify-content: flex-start;
             align-items: center;
-            // word-break: break-all;
             padding: 5px;
             box-sizing: border-box;
             border: 2px solid #fff;
@@ -249,7 +228,6 @@ export default class ImagePicker extends Vue {
             padding: 10px;
             margin: 5px;
             color: #fff;
-            // background-color: $colorDark;
             border-radius: 2px;
             cursor: pointer;
             outline: none;
@@ -283,10 +261,8 @@ export default class ImagePicker extends Vue {
         }
 
         &-item {
-            // height: 140px;
             width: 100px;
             border: 1px solid transparent;
-            // background-color: $colorDark;
             margin: 10px;
             box-sizing: border-box;
             color: $colorDark;
@@ -296,7 +272,6 @@ export default class ImagePicker extends Vue {
                 background-color: $colorGreen;
                 border: 1px solid $colorGreen;
                 color: #fff;
-                // transform: scale(1.1);
             }
 
             &-selected {
@@ -308,7 +283,6 @@ export default class ImagePicker extends Vue {
             &-img {
                 box-sizing: border-box;
                 overflow: hidden;
-                // border: 2px solid $colorDark;
                 width: 98px;
                 height: 98px;
                 padding: 2px;

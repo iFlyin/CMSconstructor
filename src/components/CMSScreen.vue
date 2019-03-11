@@ -80,6 +80,7 @@ import { snapshot, colors } from '@/mixins';
 import CmsElement from './CMSElement.vue';
 import intersect from 'path-intersection';
 import ScreenResize from './CMSResize.vue';
+import { Screen, CMS, Panel, AddCMS, Props, SetSize, Drag } from '@/interfaces';
 
 @Component({
     components: {CmsElement, ScreenResize},
@@ -93,9 +94,8 @@ import ScreenResize from './CMSResize.vue';
             screenList: 'getScreenList',
             selected: 'getSelected',
             addProps: 'getProp',
-            
+            panel: 'getPanel'
         }),
-        ...mapGetters({ panel: 'getPanel' })
     },
     methods: {
         ...mapMutations('CMS', {
@@ -106,19 +106,18 @@ import ScreenResize from './CMSResize.vue';
     }
 })
 export default class CMSScreen extends Vue {
-   private el!: any;
-   private item!: any;
-   private selected!: number;
-   // добавить интерфейс объектов
-   private zoom!: any;
-   private cmsList!: any[];
-   private screenList!: any[];
-   public panel!: any;
-   public setID!: any;
-   public addCMS!: any;
-   public addProps!: any;
-   public id!: any;
-   public saveSnapshot!: any;
+   public id!: number;
+   public item!: Screen;
+   public screenList!: Screen[];
+   public cmsList!: CMS[];
+   public zoom!: number;
+   public selected!: number;
+   public panel!: Panel;
+   public addProps!: Props;
+   
+   public saveSnapshot!: () => void;
+   public setID!: (payload: number) => void;
+   public addCMS!: (payload: AddCMS) => void;
    
    private get X(): number { return this.item.params.X; }
    private get Y(): number { return this.item.params.Y; }
@@ -130,93 +129,88 @@ export default class CMSScreen extends Vue {
 
    public get isSelected(): boolean { return this.item.props.id === this.selected; }
 
-   private get childsList(): any[] {
-      const screen = this.item.props.id;
-      const fixId = (screen === - 1) ? null : screen;
+   public get childsList(): CMS[] {
+      const id: number = this.item.props.id;
+      const fixId: number | null = (id === - 1) ? null : id;
       return this.cmsList.filter(el => el.props.parent_id == fixId);
    }
 
-    // поправить при зуме!!!
-   private get minWidth(): number {
-      let minWidth = 300;
+   public get minWidth(): number {
+      let minWidth: number = 300;
       for (const child of this.childsList) {
-         const childMaxX = child.params.X + child.params.width + (6 * this.zoom);
+         const childMaxX: number = child.params.X + child.params.width + (6 * this.zoom);
          if (childMaxX > minWidth) { minWidth = childMaxX; }
       }
       return minWidth;
    }
 
-   private get minHeight(): number {
-      let minHeight = 200;
+   public get minHeight(): number {
+      let minHeight: number = 200;
       if (this.childsList.length > 0) {
          for (const child of this.childsList) {
-            const el: any = this.$el.querySelector(`div[data-id="${child.props.id}"]`);
-            const childMaxY = child.params.Y + el.offsetHeight + 40 + (8 / this.zoom);
-            if (childMaxY > minHeight) { minHeight = childMaxY; }
+            const el: HTMLElement | null = this.$el.querySelector(`div[data-id="${child.props.id}"]`);
+               if (el) { const childMaxY = child.params.Y + el.offsetHeight + 40 + (8 / this.zoom);
+               if (childMaxY > minHeight) { minHeight = childMaxY; }
+            }
          }
       }
       return minHeight;
    }
 
-   private get childSelected(): boolean {
-      let result = false;
+   public get childSelected(): boolean {
+      let result: boolean = false;
       for (const child of this.childsList) {if (child.props.id == this.selected) {return result = true;}}
       return result;
    }
 
-   private get lines(): any[] {
-      //ЦМС соответствует экран!
-      const childWithEffect = this.childsList.filter(el => {
+   public get lines(): string[] {
+      const childWithEffect: CMS[] = this.childsList.filter(el => {
          for (const screen of this.screenList) {
             if (el.props.id == screen.props.id) { return true }
          }
       });
-      const lines: any = new Array();
+      const lines: string[] = new Array();
       for (const obj of childWithEffect) {
-         // const name = "id" + obj.props.id;
-         // const arr = new Array();
-         const startX = obj.params.X + (obj.params.width / 2) + this.X;
-         const startY = obj.params.Y + (obj.params.height / 2) + this.Y + 40;
-         const targetInd = this.screenList.findIndex(el => el.props.id == obj.props.id);
-         const targetObj = this.screenList[targetInd];
-         const targetX = targetObj.params.X - 10;
-         const targetY = targetObj.params.Y - 10;
-         const targetW = targetObj.params.width + 20;
-         const targetH = targetObj.params.height + 20;
+         const startX: number = obj.params.X + (obj.params.width / 2) + this.X;
+         const startY: number = obj.params.Y + (obj.params.height / 2) + this.Y + 40;
+         const targetInd: number = this.screenList.findIndex(el => el.props.id == obj.props.id);
+         const targetObj: Screen = this.screenList[targetInd];
+         const targetX: number = targetObj.params.X - 10;
+         const targetY: number = targetObj.params.Y - 10;
+         const targetW: number = targetObj.params.width + 20;
+         const targetH: number = targetObj.params.height + 20;
 
-         const targetPath = this.rectConstructor(targetX, targetY, targetW, targetH);
-         const path = `M${startX},${startY} L${targetX + (targetW/2)},${targetY + (targetH/2)}`;
-         // const intersect = intersect(path, targetPath);
-         // const realStartX = intersect(path, this.path)[0].x;
-         // const realStartY = intersect(path, this.path)[0].y;
+         const targetPath: string = this.rectConstructor(targetX, targetY, targetW, targetH);
+         const path: string = `M${startX},${startY} L${targetX + (targetW/2)},${targetY + (targetH/2)}`;
+
          if(intersect(path, targetPath).length) {
             const realEndX = intersect(path, targetPath)[0].x;
             const realEndY = intersect(path, targetPath)[0].y;
-            const realPath = this.lineConstructor(startX, startY, realEndX, realEndY);
+            const realPath: string = this.lineConstructor(startX, startY, realEndX, realEndY);
             lines.push(realPath);
          }
       }
       return lines;
    }
 
-   private resize(payload: any): void {
+   public resize(payload: SetSize): void {
       const that = this;
-      const layout = this.$parent.$el;
-      const e = payload.event;
+      const layout: Element = this.$parent.$el;
+      const e: MouseEvent = payload.event;
       const direction: string[] = payload.direction;
-      const id = this.item.props.id;
-      const index = this.screenList.findIndex(item => item.props.id == id);
-      const scrollX = layout.scrollLeft;
-      const scrollY = layout.scrollTop;
+      const id: number = this.item.props.id;
+      const index: number = this.screenList.findIndex(item => item.props.id == id);
+      const scrollX: number = layout.scrollLeft;
+      const scrollY: number = layout.scrollTop;
 
       function onResize(e: MouseEvent) {
          const path = that.screenList[index].params;
-         const newX = (e.clientX - that.panel.left) / that.zoom + scrollX;
-         const newY = (e.clientY - 30) / that.zoom + scrollY;
-         const minWidth = that.minWidth;
-         const minHeight = that.minHeight;
-         const moveX = e.movementX / that.zoom;
-         const moveY = e.movementY / that.zoom;
+         const newX: number = (e.clientX - that.panel.left) / that.zoom + scrollX;
+         const newY: number = (e.clientY - 30) / that.zoom + scrollY;
+         const minWidth: number = that.minWidth;
+         const minHeight: number = that.minHeight;
+         const moveX: number = e.movementX / that.zoom;
+         const moveY: number = e.movementY / that.zoom;
 
          if (direction.indexOf('left') !== -1) {
             if (newX > 0) {
@@ -251,19 +245,19 @@ export default class CMSScreen extends Vue {
       window.addEventListener('mouseup', clean);
    }
 
-   private movement(e: any): void {
+   public movement(e: MouseEvent): void {
       const that = this;
-      const layout = this.$parent.$el;
-      const index = this.screenList.findIndex(el => el.props.id === this.item.props.id);
-      const scrollX = layout.scrollLeft;
-      const scrollY = layout.scrollTop;
-      const offsetX = e.offsetX;
-      const offsetY = e.offsetY;
+      const layout: Element = this.$parent.$el;
+      const index: number = this.screenList.findIndex(el => el.props.id === this.item.props.id);
+      const scrollX: number = layout.scrollLeft;
+      const scrollY: number = layout.scrollTop;
+      const offsetX: number = e.offsetX;
+      const offsetY: number = e.offsetY;
       
       function move(e: MouseEvent): void {
-         let x = (e.clientX - offsetX - that.panel.left) / that.zoom  + scrollX;
+         let x: number = (e.clientX - offsetX - that.panel.left) / that.zoom  + scrollX;
          if (x < 0) { x = 0; }
-         let y = (e.clientY - 30 - offsetY) / that.zoom + scrollY;
+         let y: number = (e.clientY - 30 - offsetY) / that.zoom + scrollY;
          if (y < 0) { y = 0; }
          // заменить... с хард кода
          that.screenList[index].params.X = x;
@@ -280,7 +274,7 @@ export default class CMSScreen extends Vue {
       window.addEventListener('mouseup', clean);
    }
 
-   private drop(payload: any): void {
+   public drop(this: any, payload: Drag): void {
       const e: any = payload.event;
       const id: number = payload.id;
       let item;
@@ -290,15 +284,14 @@ export default class CMSScreen extends Vue {
          console.log(err);
          return;
       }
-      console.log(item)
-      const centerX = item.params.width/2;
-      const centerY = item.params.height/2;
-      let posX = e.offsetX / this.zoom - centerX;
-      const rightX = posX + item.params.width;
+      const centerX: number = item.params.width/2;
+      const centerY: number = item.params.height/2;
+      let posX: number = e.offsetX / this.zoom - centerX;
+      const rightX: number = posX + item.params.width;
       if (posX < 2) { posX = 2 }
       if (rightX > this.width) { posX = this.width - item.params.width - (2 / this.zoom); }
-      let posY = e.offsetY / this.zoom - centerY;
-      const bottomY = posY + item.params.height;
+      let posY: number = e.offsetY / this.zoom - centerY;
+      const bottomY: number = posY + item.params.height;
       if (posY < 2) { posY = 2 }
       // 70 костыль, потому как точную высоту не узнать!
       if (bottomY > (this.height - 40)) { posY = (this.height - 70) - item.params.height - (2 / this.zoom); }
@@ -307,7 +300,6 @@ export default class CMSScreen extends Vue {
       this.setID(this.id + 1);
       item.props.id = this.id;
       item.props.parent_id = (id === -1) ? null : id;
-      // console.log(this.addProps)
       for (const key in this.addProps) { item.props[key] = this.addProps[key];}
       this.addCMS({
          item: item,
@@ -315,14 +307,13 @@ export default class CMSScreen extends Vue {
       });
       const focusEl: any = this.$el;
       focusEl.focus();
-      // this.saveSnapshot();
    }
 
-   private rectConstructor(x: number, y: number, w: number, h: number): string {
+   public rectConstructor(x: number, y: number, w: number, h: number): string {
       return `M${x},${y}L${x + w},${y}L${x + w},${y + h}L${x},${y + h}Z`;
    }
 
-   private lineConstructor(x1: number, y1: number, x2: number, y2: number): string {
+   public lineConstructor(x1: number, y1: number, x2: number, y2: number): string {
       return `M${x1},${y1}L${x2},${y2}`
    }
 }

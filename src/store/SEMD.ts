@@ -1,5 +1,6 @@
 import http from './axios';
 import Vue from 'vue';
+import { Panel, PanelResize, KeyValue } from '@/interfaces';
 
 interface State {
     init: boolean;
@@ -15,24 +16,9 @@ interface Table {
     table: KeyValue[];
 }
 
-interface KeyValue {
-    [key: string]: string;
-}
-
 interface SEMD {
     id: number;
     name: string;
-}
-
-interface Panel {
-    left: number;
-    right: number;
-    footer: number;
-}
-
-interface PanelResize {
-    dir: string;
-    val: number;
 }
 
 export default {

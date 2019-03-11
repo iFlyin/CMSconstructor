@@ -11,10 +11,11 @@ import { mapGetters, mapMutations } from 'vuex';
 import AppHome from '@/views/Home.vue';
 import AppCms from '@/views/CMS.vue';
 import AppSemd from '@/views/SEMD.vue';
+import AppForm from '@/views/FORM.vue';
 
 @Component({
   	components: {
-    	AppHome, AppCms, AppSemd,
+    	AppHome, AppCms, AppSemd, AppForm,
 	  },
 	  computed: { ...mapGetters({
 		  page: 'getPage',

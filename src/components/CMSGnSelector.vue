@@ -5,25 +5,14 @@
             <font-awesome-icon icon="sort-up" class="btn btn-up" @click="$emit('set', value + 1)"/>
             <font-awesome-icon icon="sort-down" class="btn btn-down" @click="$emit('set', value - 1)"/>
         </div>
-        
     </div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 
-
-@Component({
-    props: {
-        value: {
-            type: Number,
-            default: 1,
-        }
-    } 
-})
-export default class GroupNumberSelector extends Vue {
-
-}
+@Component({ props: { value: { type: Number, default: 1 } } })
+export default class GroupNumberSelector extends Vue {}
 </script>
 
 <style lang="scss" scoped>

@@ -80,6 +80,7 @@ export default class ModalBox extends Vue {}
         padding: 20px 10px;
         flex: 0 1 auto;
         // padding: 10px;
+        height: 100%;
         max-height: 100%;
         overflow: auto;
     }
@@ -91,8 +92,8 @@ export default class ModalBox extends Vue {}
         padding: 5px 10px;
         box-sizing: border-box;
         flex: 0 0 60px;
-        padding: 40px 20px;
-        background-color: $colorGrey;
+        padding: 20px 10px;
+        background-color: $colorDark;
     }
 </style>
 

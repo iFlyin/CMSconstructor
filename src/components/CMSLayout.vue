@@ -19,7 +19,6 @@
             @movement="movement($event)"
             @resize="resize($event)"
             @drop="drop($event)"
-            @change="changeId($event)"
         />
     </div>
 </template>
@@ -29,6 +28,7 @@ import { Vue, Component } from 'vue-property-decorator';
 import { mapMutations, mapGetters } from 'vuex';
 import CmsScreen from '@/components/CMSScreen.vue';
 import { snapshot } from '@/mixins';
+import { Screen, CMS, Panel, Selected, SetZoom } from '@/interfaces';
 
 @Component({
     mixins: [ snapshot ],
@@ -39,20 +39,16 @@ import { snapshot } from '@/mixins';
             zoom: 'getZoom',
             screenList: 'getScreenList',
             cmsList: 'getCMSlist',
-            // Объединить в объект
             selected: 'getSelected',
             selectedType: 'getSelectedType',
-            loading: 'getLoading',
+            panel: 'getPanel'
         }),
-        ...mapGetters({panel: 'getPanel'}),
     },
     methods: {
         ...mapMutations('CMS', {
-            // где нибудь используется еще?
             add2screenList: 'add2screenList',
             deleteScreen: 'delFromScreenList',
             deleteCMS: 'deleteCMS',   
-            // используетя ли еще?
             clearEffect: 'clearCMSeffect',         
             select: 'setSelected',
             setZoom: 'setZoom',
@@ -60,40 +56,33 @@ import { snapshot } from '@/mixins';
     },
 })
 
-export default class LayoutBL extends Vue {
-    // описать интерфейс объекта и придать типу массива
-    private screenList!: any[];          // getScreenList
-    private add2screenList!: any;       
-    private cmsList!: any[];             // getCMSlist
-    private addCMS!: any;
-    private id!: number;
-    private setID: any;
-    private left!: number;
-    private selected!: number;
-    private selectedType!: string;
-    private zoom!: number;
-    private saveSnapshot!: any;
-    private panel!: any;
-    // private undo!: any;
-    // private redo!: any;
-  
-    private changeId!: any;
-    private deleteScreen!: any;
-    private clearEffect!: any;
-    private deleteCMS!: any;
-    private select!: any;
-    private setZoom!: any;
+export default class CMSLayout extends Vue {
+    public screenList!: Screen[];
+    public cmsList!: CMS[];
+    public left!: number;
+    public selected!: number;
+    public selectedType!: string;
+    public zoom!: number;
+    public panel!: Panel;
 
-    private del(): void {
+    public saveSnapshot!: () => void;
+    public add2screenList!: (payload: Screen) => void;
+    public deleteScreen!: (payload: number) => void;
+    public clearEffect!: (payload: number) => void;
+    public deleteCMS!: (payload: number) => void;
+    public select!: (payload: Selected) => void;
+    public setZoom!: (payload: SetZoom) => void;
+
+    public del(): void {
         const selected = this.selected;
         const type = this.selectedType;
-        let index: any = null;
-        const clear = (id: any) => {
-        const list = this.cmsList.filter((el: any) => el.props.parent_id == id);
+        let index: number | null = null;
+        const clear = (id: number) => {
+        const list = this.cmsList.filter((el: CMS) => el.props.parent_id == id);
             if (list.length > 0) {
                 for (const child of list) {
                     clear(child.props.id);
-                    const childIndex = this.cmsList.findIndex((el: any) => el.props.id == child.props.id);
+                    const childIndex = this.cmsList.findIndex((el: CMS) => el.props.id == child.props.id);
                     this.deleteCMS(childIndex);
                 }
             }
@@ -107,7 +96,7 @@ export default class LayoutBL extends Vue {
                 this.clearEffect(selected);
                 clear(selected);
             } else if (type === 'CMS') {
-                index = this.cmsList.findIndex((el: any) => el.props.id == selected);
+                index = this.cmsList.findIndex((el: CMS) => el.props.id == selected);
                 clear(selected);
                 this.deleteCMS(index);
             } else {
@@ -121,7 +110,7 @@ export default class LayoutBL extends Vue {
         });
     }
 
-    private wheel(e: any) { 
+    public wheel(e: WheelEvent) { 
         this.setZoom({
             el: this.$el,
             e: e,
@@ -129,44 +118,41 @@ export default class LayoutBL extends Vue {
         });
     }
 
-    private setScroll(e: any): void {
-        const el = this.$el;
-        const width = el.clientWidth;
-        const height = el.clientHeight;
-        const X = e.clientX - this.panel.left;
-        const Y = e.clientY - 30;
+    public setScroll(e: WheelEvent): void {
+        const el: Element = this.$el;
+        const width: number = el.clientWidth;
+        const height: number = el.clientHeight;
+        const X: number = e.clientX - this.panel.left;
+        const Y: number = e.clientY - 30;
         const offset = {
             X: X / (width * this.zoom),
             Y: Y / (height * this.zoom),
         };
 
         this.$nextTick(function() {
-            const widthNext = el.clientWidth;
-            const heightNext = el.clientHeight;
-            const scrollX = width - widthNext;
-            const scrollY = height - heightNext;
-            const scrollLeft = scrollX * offset.X;
-            const scrollTop = scrollY * offset.Y;
+            const widthNext: number = el.clientWidth;
+            const heightNext: number = el.clientHeight;
+            const scrollX: number = width - widthNext;
+            const scrollY: number = height - heightNext;
+            const scrollLeft: number = scrollX * offset.X;
+            const scrollTop: number = scrollY * offset.Y;
 
             this.$el.scrollLeft +=scrollLeft;
             this.$el.scrollTop +=scrollTop;
         });
     }
 
-    private layoutMove(e: any) {
+    public layoutMove(e: MouseEvent) {
         const that = this;
         const el: any = that.$el;
 
         function move(e: MouseEvent): void {
             el.requestPointerLock();
-            // that.$nextTick(function(){
-                el.scrollLeft -= e.movementX;
-                el.scrollTop -= e.movementY;
-            // })
+            el.scrollLeft -= e.movementX;
+            el.scrollTop -= e.movementY;
         }
 
         function clean(this: any, e: MouseEvent) {
-            // el.exitPointerLock();
             this.removeEventListener('mousemove', move);
             this.removeEventListener('mouseup', clean);
             const doc: any =  document;
@@ -175,7 +161,6 @@ export default class LayoutBL extends Vue {
 
         window.addEventListener('mousemove', move);
         window.addEventListener('mouseup', clean);
-        // window.addEventListener('mouse', clean);
     }
 
     private keyUpListner(e: KeyboardEvent): void {if(e.code === 'Delete'){this.del()} }
@@ -195,8 +180,6 @@ export default class LayoutBL extends Vue {
         position: relative;
         outline: none;
         overflow: auto;
-        // box-sizing: border-box;
-        // margin: 5px;
     }
 
    .line-container {

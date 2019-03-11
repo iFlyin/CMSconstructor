@@ -2,10 +2,7 @@
    <div class="select">
       <div class="list-wrapper" v-if="show" @click.stop="show=false" @wheel="(show = !show)"></div>
       <label class="select-label" @click="(show = !show), getPos()">
-      <!-- <span>{{label}}</span> -->{{ selectedEffect }}
-      <!-- <div class="select-button">
-         <span class="select-text">{{(selected === '') ? 'Нет' : selected}}</span>
-      </div> -->
+         {{ selectedEffect }}
       </label>
       <template v-if="show">
          <div 
@@ -27,6 +24,7 @@
                :class="{'active-item': selected === option.id}"
             >
                {{(option[name] &lt; 0) ? -(option[name]) : option.name}}
+               <!-- {{option}} -->
             </div>
          </div>
       </template>
@@ -37,16 +35,22 @@
 import { Vue, Component } from 'vue-property-decorator';
 import { mapGetters } from 'vuex';
 
+interface options {
+   [option: string]: option;
+}
+
+interface option {
+   id: number;
+   name: string;
+}
+
 @Component({
    props: {
       options: {
          type: Array,
          default: [],
       },
-      selected: {
-         // type: [String, Number],
-         required: true,
-      },
+      selected: { required: true },
       label: {
          type: String,
          default: ''
@@ -60,13 +64,13 @@ import { mapGetters } from 'vuex';
 })
 export default class ElSelect extends Vue{
    private show: boolean = false;
-   private selected!: any;
-   private options!: any;
+   private selected!: number;
+   private options!: options;
    private top: number = 0;
    private left: number = 0;
    private zoom!: number;
 
-   private select(v: any): void {
+   private select(v: number): void {
       this.show = false;
       this.$emit('select', v);
    }
@@ -78,17 +82,16 @@ export default class ElSelect extends Vue{
 
    private getPos(): void {
       const el: any = this.$parent.$el;
-      const parent :any = this.$parent.$parent.$el.firstChild;
-      const canvas :any = this.$parent.$parent.$parent;
-      const scrollLeft:any = canvas.$el.scrollLeft;
-      const scrollTop:any = canvas.$el.scrollTop;
+      const parent: any = this.$parent.$parent.$el.firstChild;
+      const canvas: any = this.$parent.$parent.$parent;
+      const scrollLeft: any = canvas.$el.scrollLeft;
+      const scrollTop: any = canvas.$el.scrollTop;
       this.top = el.offsetTop + parent.offsetTop + el.offsetHeight + 44 + (30 / this.zoom) - scrollTop;
       this.left = el.offsetLeft + parent.offsetLeft + 4 +(canvas.left / this.zoom) - scrollLeft;
    }
 
-   private get selectedEffect(): string {
-      // console.log(this.options);
-      const index = this.options.findIndex((el: any) => el.id === this.selected)
+   private get selectedEffect(this: any): string {
+      const index: number = this.options.findIndex((el: option) => el.id === this.selected)
       const effectName = index !== -1
          ? this.options[index] 
          : '';

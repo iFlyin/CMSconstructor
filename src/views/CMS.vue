@@ -21,6 +21,20 @@
           <cms-form/>
         </panel-right>
       </div>
+    <modal-box v-if="ModalBox" :height="80" :width="20">
+      <template slot="header">
+        <div class="modal-box-header">
+          <span class="modal-header">Выберите систему:</span>
+          <close-button @close="ModalBox = false"/>
+        </div>
+      </template>
+      <template slot="footer">
+        <div class="modal-grp-button">
+          <input type="button" class="modal-button modal-button-accept" value="Выбор" @click="ModalBox = false">
+          <input type="button" class="modal-button modal-button-cancel" value="Отмена" @click="ModalBox = false" >
+        </div>
+      </template>
+    </modal-box>
   </div>
 </template>
 
@@ -36,9 +50,11 @@ import Accordion from '@/components/PanelAccordion.vue';
 import LayoutBL from '@/components/CMSLayout.vue';
 import cmsForm from '@/components/CMSForm.vue';
 import MainMenu from '@/components/CMSMenu.vue';
+import ModalBox from '@/components/PanelModalBox.vue';
+import CloseButton from '@/components/PanelCloseButton.vue';
 
 @Component ({
-  components: { MainMenu, PanelLeft, PanelRight, PanelFooter, PanelCanvas, Accordion, LayoutBL, cmsForm },
+  components: { MainMenu, PanelLeft, PanelRight, PanelFooter, PanelCanvas, Accordion, LayoutBL, cmsForm, ModalBox, CloseButton },
   mixins: [ history, snapshot ],
   computed: {
     ...mapGetters('CMS', {
@@ -46,8 +62,8 @@ import MainMenu from '@/components/CMSMenu.vue';
       system_id: 'getSystemID',
       init: 'getInitStatus',
       loading: 'getLoading',
+      panel: 'getPanel',  
     }),
-    ...mapGetters({ panel: 'getPanel',  })
   },
   methods: { 
     ...mapActions('CMS', ['asyncGetLook', 'asyncGetEffect', 'asyncGetCMSbyId', 'asyncGetID', 'asyncGetImages']), 
@@ -56,8 +72,8 @@ import MainMenu from '@/components/CMSMenu.vue';
       clearAll: 'clearAll',
       // panelResize: 'panelResize',
       setSystemId: 'setSystemId',
+      panelResize: 'panelResize'
     }),
-    ...mapMutations({ panelResize: 'panelResize' })
   },
 })
 
@@ -80,6 +96,7 @@ export default class CMS extends Vue {
   private clearHistory!: any;
   private saveSnapshot!: any;
   private setSystemId!: any;
+  private ModalBox: boolean = true;
 
   private get components(): any[] {
     const newArr: any[] = new Array();
@@ -117,6 +134,8 @@ export default class CMS extends Vue {
         this.initialize(result)
         : alert('не верный ID');
    }
+
+  
 
   public initialize(e: string) {
     const init = () => {
@@ -171,6 +190,46 @@ export default class CMS extends Vue {
       display: flex;
       flex-flow: row nowrap;
     }
+  }
+
+  .modal-box-header {
+    display: flex;
+    justify-content: space-between;
+  }
+
+  .modal-button {
+    box-sizing: border-box;
+    padding: 10px;
+    margin: 5px;
+    color: #fff;
+    border-radius: 2px;
+    cursor: pointer;
+    outline: none;
+
+    &-cancel {
+      background-color: lighten(red, 20%);
+      border: 1px solid lighten(red, 10%);
+
+      &:hover {
+        background-color: lighten(red, 10%);
+      }
+    }
+
+    &-accept {
+      background-color: lighten(green, 40%);
+      border: 1px solid lighten(green, 20%);
+
+      &:hover {
+        background-color: lighten(green, 20%);
+      }
+    }
+  }
+
+  .modal-grp-button {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    width: 100%;
   }
 
 </style>
