@@ -305,7 +305,7 @@ export default class CMSScreen extends Vue {
          item: item,
          callback: this.saveSnapshot,
       });
-      const focusEl: any = this.$el;
+      const focusEl: HTMLElement = this.$el;
       focusEl.focus();
    }
 

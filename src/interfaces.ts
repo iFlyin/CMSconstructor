@@ -1,7 +1,7 @@
 export interface Panel {
     left: number;
     right: number;
-    footer: number;
+    footer?: number;
 }
 
 export interface PanelResize {

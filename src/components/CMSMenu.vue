@@ -94,14 +94,16 @@ import { Panel, PanelResize } from '@/interfaces';
          panels: 'getPanel'
       })
    },
-   methods: {...mapMutations('CMS', {
-      save: 'saveToFile',
-      load: 'loadFromFile', 
-      upload: 'saveToService',
-      cleanState: 'closeProject', 
-      panelResize: 'panelResize'
-   }), 
-   ...mapMutations({setPage: 'setPage'})}
+   methods: {
+      ...mapMutations('CMS', {
+         save: 'saveToFile',
+         load: 'loadFromFile', 
+         upload: 'saveToService',
+         cleanState: 'closeProject', 
+         panelResize: 'panelResize',
+      }), 
+   }
+   // ...mapMutations({setPage: 'setPage'})}
 })
 export default class CMSMenu extends Vue {
    public cfg: any = configCMS;  // CFG
@@ -149,8 +151,8 @@ export default class CMSMenu extends Vue {
       if(e.code === 'ArrowRight' && e.ctrlKey === true) {this.panelToogle('right')}
       if(e.code === 'ArrowDown' && e.ctrlKey === true) {this.panelToogle('footer')}
       if(e.code === 'KeyS' && e.ctrlKey === true && e.shiftKey === true) {
-         const el: any = document.getElementById('save-to-file');
-         el.click();
+         const el: HTMLElement | null = document.getElementById('save-to-file');
+         if (el) { el.click(); }
       }
       if(e.code === 'KeyS' && e.ctrlKey === true && e.shiftKey !== true) {this.upload()}
       
@@ -163,7 +165,8 @@ export default class CMSMenu extends Vue {
    private close() {
       const req: boolean = confirm('Все несохраненные данные будут утерены. Вы действительно хотите выйти?');
       if (req) {
-         this.setPage('app-home');
+         this.$store.commit('setPage', 'app-home')
+         // this.setPage('app-home');
          this.cleanState();
          this.clearHistory();
          this.panelResize({dir: 'left', val: 0});

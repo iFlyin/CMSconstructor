@@ -83,24 +83,9 @@ export default class CMSMenu extends Vue {
    public init!: any;
    public setPage!: any;
 
-   public get left(): boolean {
-      return this.panels.left > 2 
-         ? true
-         : false;
-   }
-
-   public get right(): boolean {
-      return this.panels.right > 2 
-         ? true
-         : false;
-   }
-   
-   public get footer(): boolean {
-      return this.panels.footer > 2 
-         ? true
-         : false;
-   }
-
+   public get left(): boolean { return this.panels.left > 2 ? true : false; }
+   public get right(): boolean { return this.panels.right > 2 ? true : false; }
+   public get footer(): boolean { return this.panels.footer > 2 ? true : false; }
    public panelToogle(this: any, dir: string) {
       if(this.init || dir === 'left') {
          this.panelResize({

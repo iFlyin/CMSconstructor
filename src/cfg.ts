@@ -1,4 +1,15 @@
 // убрать в миксин
+interface MainMenu {
+    file: string;
+    edit: string;
+    view: string;
+    leftPanel: string;
+    rightPanel: string;
+    footerPanel: string;
+    undo: string;
+    redo: string;
+}
+
 interface Config {
     file: string;
     edit: string;
@@ -15,6 +26,17 @@ interface Config {
     rightPanel: string;
     footer: string;
 }
+
+export const menuConfig = {
+    file: 'Файл',
+    edit: 'Правка',
+    view: 'Вид',
+    undo: 'Отменить',
+    redo: 'Повторить',
+    leftPanel: 'Левая панель',
+    rightPanel: 'Правая панель',
+    footerPanel: 'Нижняя панель',
+};
 
 export const configCMS: Config = {
     file: 'Файл',
