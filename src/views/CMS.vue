@@ -1,47 +1,89 @@
 <template>
-  <div id="constructor" :style="{ cursor: loading ? 'wait': 'auto' }">
-    <main-menu @newproject="prompt()" @initByID="asyncGetCMSbyId({
-      id: $event,
-      callback: clearHistory,
-    })"/>
-    <panel-left :width="panel.left" @resize="panelResize({dir: 'left', val: $event})" v-if="init">
-      <accordion :list="[
-        {
-          name: 'СMS-web_look',
-          list: components,
-          d$d: true,
-        },
-      ]"/>
-    </panel-left>
+	<div id="constructor" :style="{ cursor: loading ? 'wait': 'auto' }">
+    	<!-- <main-menu @newproject="prompt()" @initByID="asyncGetCMSbyId({
+      	id: $event,
+      	callback: clearHistory,
+    	})"/> -->
+    	<main-menu :base="'CMS'" @upload="upload()">
+      	<li class="menu-list-item">
+          	<a class="menu-list-item-link" @click="prompt()">{{config.new}}</a>
+        	</li>
+        	<li class="menu-list-item">
+          	<a class="menu-list-item-link" @click.stop>
+            	{{config.load}}
+          	</a>
+         	<ul class="menu-side-list" :style="{background: colorGreen}">
+            	<li 
+              	v-for="system of systemsList"
+              	:key="system.uuid"
+              	@click="asyncGetCMSbyId({
+							  id: system.uuid,
+							  callback: clearHistory,
+						})"                        
+            	>
+              		<a class="menu-side-list-item">{{system.name}}</a>
+            	</li>
+         	</ul>
+        	</li>
+        	<li class="menu-list-item" >
+          	<a class="menu-list-item-link" @click="upload()">
+            	{{config.save}}
+          	</a>
+        	</li>
+        	<li class="menu-list-item">
+          	<a class="menu-list-item-link" id="save-to-file" @click="save($event.target)">
+            	{{config.saveFile}}
+          	</a>
+        	</li>
+        	<li class="menu-list-item">
+          	<label for ="inputfile" class="menu-list-item-link" @click.stop>
+            	{{config.loadFile}}
+          	</label>
+          	<input type="file" class="inputfile" id="inputfile" @change="load({
+            	file: $event,
+            	callback: clearHistory,
+          	})">
+        	</li>
+    	</main-menu>
+    	<panel-left :width="panel.left" @resize="panelResize({dir: 'left', val: $event})" v-if="init">
+      	<!-- <accordion :list="[
+        		{
+         	 	name: 'СMS-web_look',
+         	 	list: components,
+         	 	d$d: true,
+        		},
+      	]"/> -->
+        <cms-list :list="components"/>
+    	</panel-left>
       <div class="flex-row">
-        <panel-canvas :width="canvasWidth" :height="canvasHeight">
-          <layout-b-l :left="panel.left"/>
-        </panel-canvas>
-        <panel-right :width="panel.right" :height="canvasHeight" @resize="panelResize({dir: 'right', val: $event})" v-if="init">
-          <cms-form/>
-        </panel-right>
+        	<panel-canvas :width="canvasWidth" :height="canvasHeight">
+          	<layout-b-l :left="panel.left"/>
+        	</panel-canvas>
+        	<panel-right :width="panel.right" :height="canvasHeight" @resize="panelResize({dir: 'right', val: $event})" v-if="init">
+          	<cms-form/>
+        	</panel-right>
       </div>
-    <modal-box v-if="ModalBox" :height="80" :width="20">
-      <template slot="header">
-        <div class="modal-box-header">
-          <span class="modal-header">Выберите систему:</span>
-          <close-button @close="ModalBox = false"/>
-        </div>
-      </template>
-      <template slot="footer">
-        <div class="modal-grp-button">
-          <input type="button" class="modal-button modal-button-accept" value="Выбор" @click="ModalBox = false">
-          <input type="button" class="modal-button modal-button-cancel" value="Отмена" @click="ModalBox = false" >
-        </div>
-      </template>
-    </modal-box>
-  </div>
+    	<modal-box v-if="ModalBox" :height="80" :width="20">
+      	<template slot="header">
+        		<div class="modal-box-header">
+          		<span class="modal-header">Выберите систему:</span>
+          		<close-button @close="ModalBox = false"/>
+        	</div>
+      	</template>
+      	<template slot="footer">
+        		<div class="modal-grp-button">
+          		<input type="button" class="modal-button modal-button-accept" value="Выбор" @click="ModalBox = false">
+          		<input type="button" class="modal-button modal-button-cancel" value="Отмена" @click="ModalBox = false" >
+        		</div>
+      	</template>
+    	</modal-box>
+	</div>
 </template>
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import { mapGetters, mapActions, mapMutations} from 'vuex';
-import { history, snapshot } from '@/mixins';
+import { history, snapshot, colors } from '@/mixins';
 import PanelLeft from '@/components/PanelLeft.vue';
 import PanelRight from '@/components/PanelRight.vue';
 import PanelFooter from '@/components/PanelFooter.vue';
@@ -49,13 +91,15 @@ import PanelCanvas from '@/components/PanelCanvas.vue';
 import Accordion from '@/components/PanelAccordion.vue';
 import LayoutBL from '@/components/CMSLayout.vue';
 import cmsForm from '@/components/CMSForm.vue';
-import MainMenu from '@/components/CMSMenu.vue';
+import MainMenu from '@/components/PanelTop.vue';
 import ModalBox from '@/components/PanelModalBox.vue';
 import CloseButton from '@/components/PanelCloseButton.vue';
+import cmsList from '@/components/CMSList.vue';
+import { configCMS } from '@/cfg';
 
 @Component ({
-  components: { MainMenu, PanelLeft, PanelRight, PanelFooter, PanelCanvas, Accordion, LayoutBL, cmsForm, ModalBox, CloseButton },
-  mixins: [ history, snapshot ],
+  components: { MainMenu, PanelLeft, PanelRight, PanelFooter, PanelCanvas, LayoutBL, cmsForm, ModalBox, CloseButton, cmsList },
+  mixins: [ history, snapshot, colors ],
   computed: {
     ...mapGetters('CMS', {
       weblook: 'getWebLook', 
@@ -78,6 +122,7 @@ import CloseButton from '@/components/PanelCloseButton.vue';
 })
 
 export default class CMS extends Vue {
+  public config = configCMS;
   public panel!: any;
   private windowWidth: number = window.innerWidth;
   private windowHeight: number = window.innerHeight;
@@ -96,7 +141,9 @@ export default class CMS extends Vue {
   private clearHistory!: any;
   private saveSnapshot!: any;
   private setSystemId!: any;
-  private ModalBox: boolean = true;
+  private ModalBox: boolean = false;
+
+  public get systemsList(): any { return this.$store.getters['CMS/getSystemsList']; }
 
   private get components(): any[] {
     const newArr: any[] = new Array();
@@ -133,7 +180,11 @@ export default class CMS extends Vue {
       result ?
         this.initialize(result)
         : alert('не верный ID');
-   }
+	}
+	
+	public upload(): void { this.$store.commit('CMS/saveToService'); }
+	public save(payload: any): void { this.$store.commit('CMS/saveToFile', payload); }
+	public load(payload: any): void { this.$store.commit('CMS/loadFromFile', payload); }
 
   
 
@@ -230,6 +281,10 @@ export default class CMS extends Vue {
     justify-content: flex-end;
     align-items: center;
     width: 100%;
+  }
+
+  .inputfile {
+    display: none;
   }
 
 </style>

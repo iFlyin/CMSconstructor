@@ -57,7 +57,6 @@ export default {
       panel: {
          left: 0,
          right: 0,
-         footer: 0,
       },
       systems_list: [
          {
@@ -544,8 +543,8 @@ export default {
                systems_id: CMS.props.systems_id,
                json: JSON.stringify(CMS.params),
             });
-            // console.log(obj);
-            // console.log(params);
+            console.log(obj);
+            console.log(params);
          }
          // console.log(state.deleteList);
       },

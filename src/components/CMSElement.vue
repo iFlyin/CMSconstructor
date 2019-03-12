@@ -132,7 +132,7 @@ export default class CMSElement extends Vue {
             ? -1
             : this.item.props.parent_id;
         const index: number = this.cmsList.findIndex((item: CMS) => item.props.id === id);
-        const parentIndex: number = this.screenList.findIndex((el: any) => el.props.id === parent_id);
+        const parentIndex: number = this.screenList.findIndex((el: Screen) => el.props.id === parent_id);
         const parent: Screen = this.screenList[parentIndex];
         const parentOffsetX: number = parent.params.X;
         const parentOffsetY: number = parent.params.Y + 40;
@@ -140,6 +140,7 @@ export default class CMSElement extends Vue {
         const scrollY: number = layout.scrollTop;
         const offsetX: number = e.offsetX;
         const offsetY: number = e.offsetY;
+        const left: number = this.panel.left ? this.panel.left : 0;
 
         // добавить тип для элемента HTML или Element 
 
@@ -150,7 +151,7 @@ export default class CMSElement extends Vue {
         const maxY: number = (parent.params.height - 40) - cmsHeight - (5 / this.zoom);
       
         function move(e: MouseEvent): void {
-            let x: number = (e.clientX - offsetX - that.panel.left) / that.zoom  + scrollX - parentOffsetX;
+            let x: number = (e.clientX - offsetX - left) / that.zoom  + scrollX - parentOffsetX;
             if (x < 2) { x = 2; }
             if (x > maxX - 2) { x = maxX - 2}
             let y: number = (e.clientY - 30 - offsetY) / that.zoom + scrollY - parentOffsetY;

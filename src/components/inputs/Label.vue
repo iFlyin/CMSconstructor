@@ -93,6 +93,13 @@ export default class InputView extends Vue {
       padding: 5px 20px;
       border-bottom: 1px solid grey;
       margin: 0 5px;
+      background-color: $colorDark;
+      margin: 2px 0;
+      color: #fff;
+
+      &:first-child {
+         margin: 0;
+      }
    }
 
    .input-label {

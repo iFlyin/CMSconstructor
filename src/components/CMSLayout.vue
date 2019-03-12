@@ -122,7 +122,8 @@ export default class CMSLayout extends Vue {
         const el: Element = this.$el;
         const width: number = el.clientWidth;
         const height: number = el.clientHeight;
-        const X: number = e.clientX - this.panel.left;
+        const left: number = this.panel.left ? this.panel.left : 0;
+        const X: number = e.clientX - left;
         const Y: number = e.clientY - 30;
         const offset = {
             X: X / (width * this.zoom),

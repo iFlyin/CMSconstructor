@@ -202,10 +202,11 @@ export default class CMSScreen extends Vue {
       const index: number = this.screenList.findIndex(item => item.props.id == id);
       const scrollX: number = layout.scrollLeft;
       const scrollY: number = layout.scrollTop;
+      const left: number = this.panel.left ? this.panel.left : 0;
 
       function onResize(e: MouseEvent) {
          const path = that.screenList[index].params;
-         const newX: number = (e.clientX - that.panel.left) / that.zoom + scrollX;
+         const newX: number = (e.clientX - left) / that.zoom + scrollX;
          const newY: number = (e.clientY - 30) / that.zoom + scrollY;
          const minWidth: number = that.minWidth;
          const minHeight: number = that.minHeight;
@@ -253,9 +254,10 @@ export default class CMSScreen extends Vue {
       const scrollY: number = layout.scrollTop;
       const offsetX: number = e.offsetX;
       const offsetY: number = e.offsetY;
+      const left: number = this.panel.left ? this.panel.left : 0;
       
       function move(e: MouseEvent): void {
-         let x: number = (e.clientX - offsetX - that.panel.left) / that.zoom  + scrollX;
+         let x: number = (e.clientX - offsetX - left) / that.zoom  + scrollX;
          if (x < 0) { x = 0; }
          let y: number = (e.clientY - 30 - offsetY) / that.zoom + scrollY;
          if (y < 0) { y = 0; }

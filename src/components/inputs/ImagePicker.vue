@@ -73,6 +73,7 @@ export default class ImagePicker extends Vue {
     public async getSize(index: number) {
         let img: any = new Image();
         img.src = location + this.images[index];
+        console.log(img);
         const load: Promise<string> = new Promise(resolve => {
             img.onload = function(){
                 resolve(`${this.naturalWidth} x ${this.naturalHeight}`);
@@ -91,6 +92,7 @@ export default class ImagePicker extends Vue {
         for (let i = 0; i < this.images.length; i++) {
             (async () => {
                 const size: string = await this.getSize(i);
+                // console.log(size);
                 const name = this.getName(i);
                 this.cards.push({
                     src: this.images[i],

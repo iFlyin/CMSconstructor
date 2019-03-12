@@ -1,13 +1,16 @@
 <template>
-   <form class="cms-form">
-      <app-input 
-         v-for="(item, key, index) of params" :key="index"
-         :label="key"
-         :component="item.type"
-         :cms="CMS"
-         @change="change()"
-      />
-   </form>
+   <div class="cms-form-wrapper">
+      <div class="cms-form-header">Параметры</div>
+      <form class="cms-form">
+         <app-input 
+            v-for="(item, key, index) of params" :key="index"
+            :label="key"
+            :component="item.type"
+            :cms="CMS"
+            @change="change()"
+         />
+      </form>
+   </div>
 </template>
 
 <script lang="ts">
@@ -49,12 +52,31 @@ export default class CMSForm extends Vue {
 <style lang="scss" scoped>
    .cms-form {
       box-sizing: border-box;
-      padding: 5px;
+      // padding: 2px;
       width: 100%;
-      height: 100%;
-      background-color: $colorDark;
-      color: #fff;
-      overflow-x: hidden;
+      height: calc(100% - 40px);
+      background-color: #fff;
+      color: $colorDark;
+      
       overflow-y: auto;
+
+      &-wrapper {
+         box-sizing: border-box;
+         padding: 2px;
+         border-left: 2px solid $colorDark;
+         overflow: hidden;
+         width: 100%;
+         height: 100%;
+      }
+
+      &-header {
+         background-color: $colorGreen;
+         color: #fff;
+         display: flex;
+         justify-content: center;
+         align-items: center;
+         height: 40px;
+         margin-bottom: 2px;
+      }
    }
 </style>

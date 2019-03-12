@@ -5,7 +5,9 @@ import { Panel, PanelResize} from '@/interfaces';
 interface State {
     init: boolean;
     panel: Panel;
-    test: string;
+    components: {
+        [key: number]: string;
+    };
 }
 
 export default {
@@ -17,16 +19,45 @@ export default {
             right: 0,
             footer: 0,
         },
-        test: 'РАБОТАЕТ!!!',
+        components: {
+            1: 'checkbox',
+            2: 'combobox',
+            3: 'datepicker',
+            4: 'datetimepicker',
+            5: 'edit',
+            6: 'updown',
+            7: 'manual',
+            8: 'memo',
+            9: 'button',
+            10: 'bitbutton',
+            11: 'hyperlink',
+            12: 'passwordedit',
+            13: 'label',
+            14: 'textbox',
+            15: 'separator',
+            16: 'controlgrid',
+            17: 'linebreak',
+            18: 'controlgrid',
+            19: 'panel',
+            20: 'groupbox',
+            21: 'multichoice_combobox',
+          },
     },
     getters: {
-        getInit(state: State): boolean { return state.init; },
+        getInitStatus(state: State): boolean { return state.init; },
         getPanel(state: State): Panel { return state.panel; },
-        getTest(state: State): string { return state.test; },
+        getComponents(state: State): any { return state.components; },
     },
     mutations: {
         panelResize(state: State, payload: PanelResize): void {
             Vue.set(state.panel, payload.dir, payload.val);
+        },
+        initialize(state: State) {
+            state.init = true;
+        },
+        closeProject(state: State): void {
+            localStorage.clear();
+            state.init = false;
         },
     },
     actions: {},

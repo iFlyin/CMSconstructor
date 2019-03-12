@@ -1,6 +1,19 @@
 <template>
     <div id="constructor">
-        <main-menu @newproject="initialize()"/>
+        <main-menu :base="'SEMD'">
+            <li class="menu-list-item">
+                <a class="menu-list-item-link" v-html="config.new" @click="initialize()"/>
+            </li>
+            <li class="menu-list-item">
+                <a class="menu-list-item-link" v-html="config.save" @click.stop/>
+            </li>
+            <li class="menu-list-item">
+                <a class="menu-list-item-link" v-html="config.saveFile" @click.stop/>
+            </li>
+            <li class="menu-list-item">
+                  <a class="menu-list-item-link" v-html="config.loadFile" @click.stop/>
+            </li>
+        </main-menu>
         <panel-left :width="panel.left" @resize="panelResize({dir: 'left', val: $event})">
             <app-list :list="SEMDs" @select="getSEMDbyID($event)"/>
         </panel-left>
@@ -24,7 +37,7 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import { mapGetters, mapMutations, mapActions } from 'vuex';
-import MainMenu     from '@/components/SEMDMenu.vue';
+import MainMenu     from '@/components/PanelTop.vue';
 import PanelLeft    from '@/components/PanelLeft.vue';
 import PanelRight   from '@/components/PanelRight.vue';
 import PanelFooter  from '@/components/PanelFooter.vue';
@@ -34,6 +47,7 @@ import TextEditor   from '@/components/SEMDTextEditor.vue';
 import AppConfig    from '@/components/SEMDConfig.vue';
 import AppList      from '@/components/SEMDList.vue';
 import ModalBox     from '@/components/PanelModalBox.vue';
+import {configSEMD} from '@/cfg';
 
 @Component({
     components: { MainMenu, PanelLeft, PanelRight, PanelFooter, PanelCanvas, SemdLayout, TextEditor, AppConfig, AppList, ModalBox}, 
@@ -55,6 +69,7 @@ import ModalBox     from '@/components/PanelModalBox.vue';
 })
 
 export default class SEMD extends Vue {
+    public config = configSEMD;
     public panel!: any;
     private windowWidth: number = window.innerWidth;
     private windowHeight: number = window.innerHeight;

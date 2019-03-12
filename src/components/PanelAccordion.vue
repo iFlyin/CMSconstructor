@@ -53,7 +53,7 @@ export default class Accordion extends Vue {
       height: 100%;
       width: 100%;
       overflow: hidden;
-      background-color: $colorDark;
+      background-color: #fff;
 
       &-item {
          display: flex;

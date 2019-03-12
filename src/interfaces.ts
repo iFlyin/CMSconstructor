@@ -1,6 +1,6 @@
 export interface Panel {
-    left: number;
-    right: number;
+    left?: number;
+    right?: number;
     footer?: number;
 }
 
