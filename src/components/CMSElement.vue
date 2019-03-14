@@ -153,10 +153,10 @@ export default class CMSElement extends Vue {
         function move(e: MouseEvent): void {
             let x: number = (e.clientX - offsetX - left) / that.zoom  + scrollX - parentOffsetX;
             if (x < 2) { x = 2; }
-            if (x > maxX - 2) { x = maxX - 2}
+            if (x > maxX - 2 && maxX - 2 > 2) { x = maxX - 2} else if (x > maxX - 2 && maxX - 2 <= 2) { x = 2 }
             let y: number = (e.clientY - 30 - offsetY) / that.zoom + scrollY - parentOffsetY;
             if (y < 2) { y = 2; }
-            if (y > maxY - 2) { y = maxY - 1}
+            if (y > maxY - 2 && maxY - 2 > 2) { y = maxY - 2} else if (y > maxY - 2 && maxY - 2 <= 2) { y = 2 }
 
             that.setPosition({
                 id: that.item.props.id,

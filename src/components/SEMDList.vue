@@ -59,6 +59,7 @@ export default class Tree extends Vue {
         // margin-top: 2px;
         border-right: 2px solid $colorDark;
         // overflow: hidden;
+        font-size: 12px;
         
 
         &-header {

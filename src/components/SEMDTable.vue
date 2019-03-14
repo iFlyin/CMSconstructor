@@ -23,7 +23,7 @@
             <tbody class="table-body">
                 <tr v-for="(row, rowIndex) of table" :key="row['№ п.п.']" class="table-rows">
                     <td v-for="(key, index) of thead" :key="index" class="table-header-cells table-cells" :title="row[key]">
-                        <span class="table-input" :contenteditable="!move" @change="setValue($event, rowIndex, key)" :style="{'user-select': move ? 'none': ''}" v-html="row[key]"/>
+                        <span class="table-input" :contenteditable="!move" @blur="setValue($event, rowIndex, key)" :style="{'user-select': move ? 'none': ''}" v-html="row[key]"/>
                         <!-- <i class="table-row-resize" @mousedown="rowResize($event)" v-if="index === 0"/> -->
                     </td>
                 </tr>
@@ -66,13 +66,14 @@ export default class AppTable extends Vue {
     public table: any = new Array();
 
     public setValue(e: any, index: number, key: string) {
-        console.log(index)
         this.table[index][key] = e.target.outerText;
+        console.log(this.table[index][key]);
     }
 
     public colResize(e: MouseEvent) {
         const that = this;
-        const el: Element = e.target.parentElement;
+        const target : any = e.target;
+        const el: any = target.parentElement;
 
         function resize(e: MouseEvent) {
             that.move = true;

@@ -57,6 +57,7 @@ export default class CMSForm extends Vue {
       height: calc(100% - 40px);
       background-color: #fff;
       color: $colorDark;
+      font-size: 12px;
       
       overflow-y: auto;
 

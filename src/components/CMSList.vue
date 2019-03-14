@@ -52,6 +52,7 @@ export default class CMSList extends Vue {
         padding: 2px;
         box-sizing: border-box;
         border-right: 2px solid $colorDark;
+        font-size: 12px;
 
         &-header {
             background-color: $colorGreen;

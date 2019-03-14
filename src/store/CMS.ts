@@ -317,7 +317,11 @@ export default {
          }
          if (effect !== null) {
             const check: boolean = effect in state.effect2screen;
-            if (check) { newScreen(state.effect2screen[effect].name); }
+            if (check) {
+               const name = state.effect2screen[effect].name.split(' ').slice(2).join(' ');
+               // console.log(name);
+               newScreen(name);
+            }
          }
          if (look !== null) {
             const check: boolean = look in state.look2screen;
@@ -497,7 +501,7 @@ export default {
          state.effect2screen = payload;
       },
       setSystemsList(state: State, payload: StringString[]) {
-         console.log(payload);
+         // console.log(payload);
          state.systems_list = payload;
       },
    },

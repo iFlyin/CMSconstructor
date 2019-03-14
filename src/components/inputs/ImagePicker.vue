@@ -27,6 +27,13 @@
                 </div>
             </template>
             <div class="image-list">
+                <div class="image-item" @click="selected = -1" :class="{'image-item-selected': -1 === selected}">
+                    <div class="image-item-img">
+                        <img :src="empty" :alt="'Не задан'">
+                    </div>
+                    <span class="image-item-name">Не задан</span>
+                    <div class="image-item-size">0 х 0</div>
+                </div>
                 <div class="image-item" v-for="(img, index) of cards" :key="index" @click="selected = index" :class="{'image-item-selected': index === selected}">
                     <div class="image-item-img">
                         <img :src="img.src" :alt="img.name">
@@ -37,8 +44,8 @@
             </div>
             <template slot="footer">
                 <div class="modal-grp-button">
-                    <input type="button" class="modal-button modal-button-accept" :disabled="(selected === -1)" value="Выбор" @click="ModalBox = false, $emit('change', cards[selected].name)">
-                    <input type="button" class="modal-button modal-button-cancel" value="Отмена" @click="ModalBox = false, selected = -1" >
+                    <input type="button" class="modal-button modal-button-accept" value="Выбор" @click="ModalBox = false, select()">
+                    <input type="button" class="modal-button modal-button-cancel" value="Отмена" @click="ModalBox = false" >
                 </div>
             </template>
         </modal-box>
@@ -68,7 +75,11 @@ export default class ImagePicker extends Vue {
     public ModalBox: boolean = false;
     public images!: string[];
     public cards: Card[] = new Array();
-    public selected: number = -1;
+    public selected: number = this.value;
+
+    public get value(): number {
+        return this.cards.findIndex((el: any) => el.name === this.val);
+    }
 
     public async getSize(index: number) {
         let img: any = new Image();
@@ -133,6 +144,17 @@ export default class ImagePicker extends Vue {
         return require(`@/assets/not_found.jpg`);
         // return 'd:/svn/images/accept.png'
     }
+
+    public select() {
+        console.log(this.selected);
+        if (this.selected === -1) {
+            this.$emit('change', null);
+        } else if (this.selected >= 0) {
+            this.$emit('change', this.cards[this.selected].name);
+        } else {
+            console.log('неверный индекс')
+        };
+    }
 }
 </script>
 
@@ -145,8 +167,15 @@ export default class ImagePicker extends Vue {
         padding: 0 !important;
 
         &-img {
-            flex: 0 1 auto;
-            background-color: #fff;
+            flex: 1 1 auto;
+            // background-color: red;
+           background-image:
+                linear-gradient(45deg, rgba(20, 20, 20, 0.2) 25%, transparent 25%),
+                linear-gradient(45deg, transparent 75%, rgba(20, 20, 20, 0.2) 75%),
+                linear-gradient(45deg, transparent 75%, rgba(20, 20, 20, 0.2) 75%),
+                linear-gradient(45deg, rgba(20, 20, 20, 0.2) 25%, transparent 25%);    
+            background-size:10px 10px;       
+            background-position:0 0, 0 0, -5px -5px, 5px 5px;
             width: 120px;
             height: 120px;
             padding: 5px;
@@ -173,7 +202,7 @@ export default class ImagePicker extends Vue {
         }
 
         &-info {
-            flex: 1 1 auto;
+            flex: 1000 1 auto;
             display: flex;
             flex-flow: column nowrap;
             box-sizing: border-box;
@@ -187,9 +216,14 @@ export default class ImagePicker extends Vue {
             display: flex;
             justify-content: flex-start;
             align-items: center;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            overflow: hidden;
             padding: 5px;
             box-sizing: border-box;
             border: 2px solid #fff;
+            // line-height: 23px;
+            // vertical-align: 15px;
 
         }
         
@@ -283,12 +317,22 @@ export default class ImagePicker extends Vue {
                 background-color: $colorGreen;
                 border: 1px solid $colorGreen;
                 color: #fff;
+
+                & > .image-item-img {
+                    background-image: none;
+                    background-color: #fff;
+                }
             }
 
             &-selected {
                 background-color: $colorDark;
                 border: 1px solid $colorDark;
                 color: #fff;
+
+                & > .image-item-img {
+                    background-image: none;
+                    background-color: #fff;
+                }
             }
 
             &-img {
@@ -297,7 +341,14 @@ export default class ImagePicker extends Vue {
                 width: 98px;
                 height: 98px;
                 padding: 2px;
-                background-color: #fff;
+                // background-color: #fff;
+                background-image:
+                    linear-gradient(45deg, rgba(20, 20, 20, 0.1) 25%, transparent 25%),
+                    linear-gradient(45deg, transparent 75%, rgba(20, 20, 20, 0.1) 75%),
+                    linear-gradient(45deg, transparent 75%, rgba(20, 20, 20, 0.1) 75%),
+                    linear-gradient(45deg, rgba(20, 20, 20, 0.1) 25%, transparent 25%);    
+                background-size:10px 10px;       
+                background-position:0 0, 0 0, -5px -5px, 5px 5px;
                 display: flex;
                 justify-content: center;
                 align-items: center;

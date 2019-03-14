@@ -124,8 +124,8 @@ export default class CMS extends Vue {
   private windowHeight: number = window.innerHeight;
   // private asyncGetID!: any;
   // private asyncGetCMSbyId!: any;
-  private screen!: any;
-  private block!: any;
+  // private screen!: any;
+  // private block!: any;
   // private system_id!: any;
   // private addFirstScreen!: any;
   // private clearAll!: any;
@@ -139,6 +139,10 @@ export default class CMS extends Vue {
   public get init(): boolean { return this.$store.getters['CMS/getInitStatus']; }
   public get loading(): boolean { return this.$store.getters['CMS/getLoading']; }
   public get panel(): any { return this.$store.getters['CMS/getPanel']; }
+
+  public panelResize(payload: any) {
+    this.$store.commit('CMS/panelResize', payload);
+  }
 
   public get systemsList(): any { return this.$store.getters['CMS/getSystemsList']; }
 
@@ -292,4 +296,3 @@ export default class CMS extends Vue {
   }
 
 </style>
-
