@@ -72,8 +72,8 @@ export default class ImagePicker extends Vue {
 
     public async getSize(index: number) {
         let img: any = new Image();
-        img.src = location + this.images[index];
-        console.log(img);
+        const images = this.$store.getters['CMS/getImages'];
+        img.src = 'http://172.16.1.48:9000/assets/images/' + images[index];
         const load: Promise<string> = new Promise(resolve => {
             img.onload = function(){
                 resolve(`${this.naturalWidth} x ${this.naturalHeight}`);
@@ -82,25 +82,33 @@ export default class ImagePicker extends Vue {
         return await load;
     }
 
-    public getName(index: number): string {
-        const arr = this.images[index].split('/');
-        const name = arr[arr.length - 1];
-        return name;
-    }
+    // public getName(index: number): string {
+    //     const images = this.$store.getters['CMS/getImages'];
+    //     // const arr = this.images[index].split('/');
+    //     const name = images[index][images[index].length - 1];
+    //     return name;
+    // }
 
-    public created(): void {
-        for (let i = 0; i < this.images.length; i++) {
-            (async () => {
-                const size: string = await this.getSize(i);
-                // console.log(size);
-                const name = this.getName(i);
-                this.cards.push({
-                    src: this.images[i],
-                    size: size,
-                    name: name,
-                })
-            })();
+    public async created(): Promise<any> {
+        await this.$store.dispatch('CMS/asyncGetImages', 'D:\\svn\\images');
+        const images = this.$store.getters['CMS/getImages'];
+        const src = 'http://172.16.1.48:9000/assets/images/'
+        if (images) {
+            for (let i = 0; i < images.length; i++) {
+                (async () => {
+                    const img = images[i];
+                    const size: string = await this.getSize(i);
+                    // const name = this.getName(i);
+                    this.cards.push({
+                        src: src + img,
+                        size: size,
+                        name: img,
+                    })
+                })();
+            }
         }
+        // console.log (this.cards);
+        
         // console.log(this.cards)
     }
 
@@ -123,6 +131,7 @@ export default class ImagePicker extends Vue {
 
     public get empty(): string {
         return require(`@/assets/not_found.jpg`);
+        // return 'd:/svn/images/accept.png'
     }
 }
 </script>

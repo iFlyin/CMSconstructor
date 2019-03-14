@@ -1,9 +1,9 @@
 <template>
     <div class="table-wrapper">
-        <div class="table">
+        <div class="table" v-show="table.length > 0">
             <div class="table-wrapper-header">
                 <div class="table-wrapper-header-left">
-                    <span>{{root.id}} - {{name(root.id)}}</span>
+                    <span>{{root.id }} - {{name(root.id)}}</span>
                     <div class="table-wrapper-header-btn-group">
                         <button class="button button-add" title="Добавить строку"><font-awesome-icon icon="plus"/></button>
                         <button class="button button-del" title="Удалить строку"><font-awesome-icon icon="minus"/></button>
@@ -13,15 +13,18 @@
             </div>
             <thead class="table-header">
                 <tr>
-                    <th v-for="(key, index) of thead" :key="index" class="table-header-cells table-cells">
+                    <th v-for="(key, index) of thead" :key="index" class="table-header-cells table-cells" :title="key">
                         {{key}}
+                        <i class="table-col-resize" @mousedown="colResize($event)"/>
                     </th>
+
                 </tr>
             </thead>
             <tbody class="table-body">
-                <tr v-for="(row, index) of table" :key="index" class="table-rows">
-                    <td v-for="(key, index) of thead" :key="index" class="table-header-cells table-cells">
-                        {{row[key]}}
+                <tr v-for="(row, rowIndex) of table" :key="row['№ п.п.']" class="table-rows">
+                    <td v-for="(key, index) of thead" :key="index" class="table-header-cells table-cells" :title="row[key]">
+                        <span class="table-input" :contenteditable="!move" @change="setValue($event, rowIndex, key)" :style="{'user-select': move ? 'none': ''}" v-html="row[key]"/>
+                        <!-- <i class="table-row-resize" @mousedown="rowResize($event)" v-if="index === 0"/> -->
                     </td>
                 </tr>
             </tbody>
@@ -55,43 +58,61 @@ import { mapGetters } from 'vuex';
             default: false,
         }
     },
-    computed: {
-        ...mapGetters('SEMD', { name: 'getName' }),
-    }
+    computed: {...mapGetters('SEMD', { name: 'getName' })},
 })
 export default class AppTable extends Vue {
-    public table: any = [
-        { 
-            key1: 'value1',
-            key2: 'value2',
-            key3: 'value3',
-            key4: 'value3',
-            key5: 'value3',
-            key6: 'value3',
-            key7: 'value3',
-            key8: 'value3',
-        },
-        { 
-            key1: 'value1',
-            key2: 'value2',
-            key3: 'value3',
-            key4: 'value3',
-            key5: 'value3',
-            key6: 'value3',
-            key7: 'value3',
-            key8: 'value3',
-        },
-        { 
-            key1: 'value1',
-            key2: 'value2',
-            key3: 'value3',
-            key4: 'value3',
-            key5: 'value3',
-            key6: 'value3',
-            key7: 'value3',
-            key8: 'value3',
-        },
-    ];
+    public root!: any;
+    public move: boolean = false;
+    public table: any = new Array();
+
+    public setValue(e: any, index: number, key: string) {
+        console.log(index)
+        this.table[index][key] = e.target.outerText;
+    }
+
+    public colResize(e: MouseEvent) {
+        const that = this;
+        const el: Element = e.target.parentElement;
+
+        function resize(e: MouseEvent) {
+            that.move = true;
+            console.log(el);
+            el.style.minWidth = el.offsetWidth + e.movementX + 'px';
+            el.style.maxWidth = el.offsetWidth + e.movementX + 'px';
+            // el.style.width = el.offsetWidth + e.movementX + 'px';
+        }
+
+        function clean() {
+            that.move = false
+            window.removeEventListener('mousemove', resize);
+            window.removeEventListener('mouseup', clean);
+        }
+
+        window.addEventListener('mousemove', resize);
+        window.addEventListener('mouseup', clean);
+    }
+
+    // public rowResize(e: MouseEvent) {
+    //     const that = this;
+    //     const el: Element = e.target.parentElement.parentElement;
+    //     const fixEl: Element = e.target.parentElement;
+
+    //     function resize(e: MouseEvent) {
+    //         that.move = true;
+    //         // el.style.minHeight = el.offsetHeight + e.movementY + 'px';
+    //         // el.style.maxHeight = el.offsetHeight + e.movementY + 'px';
+    //         el.style.height = el.offsetHeight + e.movementY + 'px';
+    //     }
+
+    //     function clean() {
+    //         that.move = false
+    //         window.removeEventListener('mousemove', resize);
+    //         window.removeEventListener('mouseup', clean);
+    //     }
+
+    //     window.addEventListener('mousemove', resize);
+    //     window.addEventListener('mouseup', clean);
+    // }
 
     public get thead(): string[] {
         const header = new Array();
@@ -105,16 +126,83 @@ export default class AppTable extends Vue {
         };
         return header;
     }
+
+    // public get name(): any { return this.$store.getters['FORM/getName']; }
+
+    public async created() {
+        // console.log(this.root);
+        const table = await this.$store.dispatch('SEMD/asyncGetTable', {
+            schema: this.root.schema,
+            table: this.root.table,
+        });
+        table.sort(function(a: any, b: any){
+            return a['№ п.п.'] - b['№ п.п.'];
+        })
+        this.table = table;
+    }
 }
 </script>
 
 <style lang="scss" scoped>
     .table {
+        flex: 0 1 auto;
         border-collapse: collapse;
         box-sizing: border-box;
         margin-bottom: 5px;
         border: 2px solid #fff;
-        box-shadow: 2px 4px 6px rgba(0, 0, 0, .33);
+        box-shadow: 0 0 10px rgba(0, 0, 0, .66);
+        font-size: 12px;
+
+        &-col-resize {
+            position: absolute;
+            top: 0;
+            right: 0px;
+            width: 4px;
+            height: 100%;
+            // background: red;
+            cursor: col-resize;
+        }
+
+        // &-row-resize {
+        //     position: absolute;
+        //     bottom: 0px;
+        //     left: 0;
+        //     width: 100%;
+        //     height: 4px;
+        //     // background: red;
+        //     cursor: row-resize;
+        // }
+
+        &-input {
+            // display: inline-block;
+            position: absolute;
+            width: calc(100% - 6px);
+            height: calc(100% - 6px);
+            top: 2px;
+            left: 2px;
+            overflow: hidden;
+            padding: 5px;
+            box-sizing: border-box;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            margin: auto;
+
+            &:focus {
+                top: 0px;
+                left: 0px;
+                z-index: 10000;
+                background-color: #fff;
+                min-height: 100%;
+                min-width: 100%;
+                height: auto;
+                width: auto;
+                box-sizing: border-box;
+                text-overflow: clip;
+                white-space: normal;
+                // padding: 12px 10px;
+            }
+        }
+
 
         &-rows {
             background-color: #fff;
@@ -128,7 +216,7 @@ export default class AppTable extends Vue {
             color: #fff;
 
             & > tr {
-                height: 30px;
+                line-height: 12px;
 
                 & > th {
                     border: 1px solid $colorGrey;
@@ -136,6 +224,10 @@ export default class AppTable extends Vue {
                     text-align: center;
                     padding: 10px;
                     box-sizing: border-box;
+                    position: relative;
+                    user-select: none;
+                    overflow: hidden;
+                    overflow-wrap: break-word;
 
                     &:first-child, &:last-child {
                         border-left: none;
@@ -146,13 +238,23 @@ export default class AppTable extends Vue {
         }
 
         &-body {
-            height: 100%;
+            // height: 100%;
 
             & > tr {
                 color: $colorDark;
+                height: 30px;
+                overflow: hidden;
+                // line-height: 12px;
+                // table-layout: fixed;
+                // overflow: hidden;
+                padding: 0;
 
                 & > td {
                     border: 1px solid $colorGrey;
+                    padding: 2px;
+                    box-sizing: border-box;
+                    position: relative;
+                    // height: 40px;
 
                     &:first-child, &:last-child {
                         border-left: none;
@@ -166,7 +268,8 @@ export default class AppTable extends Vue {
 
         &-cells {
             padding: 10px 8px;
-            width: 100%;
+            box-sizing: border-box;
+            // width: 100%;
         }
        
         &-wrapper {
@@ -235,7 +338,7 @@ export default class AppTable extends Vue {
                 }
 
                 &-child {
-                    flex: 0 1 auto;
+                    flex: 0 0 auto;
                     padding: 0 5px;
                     box-sizing: border-box;
                 }

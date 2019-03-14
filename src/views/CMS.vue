@@ -5,21 +5,18 @@
       	callback: clearHistory,
     	})"/> -->
     	<main-menu :base="'CMS'" @upload="upload()">
-      	<li class="menu-list-item">
+      	<!-- <li class="menu-list-item">
           	<a class="menu-list-item-link" @click="prompt()">{{config.new}}</a>
-        	</li>
+        	</li> -->
         	<li class="menu-list-item">
           	<a class="menu-list-item-link" @click.stop>
             	{{config.load}}
           	</a>
-         	<ul class="menu-side-list" :style="{background: colorGreen}">
+         	<ul class="menu-side-list">
             	<li 
               	v-for="system of systemsList"
               	:key="system.uuid"
-              	@click="asyncGetCMSbyId({
-							  id: system.uuid,
-							  callback: clearHistory,
-						})"                        
+              	@click="getCMSbyId(system.id)"                        
             	>
               		<a class="menu-side-list-item">{{system.name}}</a>
             	</li>
@@ -82,13 +79,13 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { mapGetters, mapActions, mapMutations} from 'vuex';
+// import { mapGetters, mapActions, mapMutations} from 'vuex';
 import { history, snapshot, colors } from '@/mixins';
 import PanelLeft from '@/components/PanelLeft.vue';
 import PanelRight from '@/components/PanelRight.vue';
 import PanelFooter from '@/components/PanelFooter.vue';
 import PanelCanvas from '@/components/PanelCanvas.vue';
-import Accordion from '@/components/PanelAccordion.vue';
+// import Accordion from '@/components/PanelAccordion.vue';
 import LayoutBL from '@/components/CMSLayout.vue';
 import cmsForm from '@/components/CMSForm.vue';
 import MainMenu from '@/components/PanelTop.vue';
@@ -100,55 +97,63 @@ import { configCMS } from '@/cfg';
 @Component ({
   components: { MainMenu, PanelLeft, PanelRight, PanelFooter, PanelCanvas, LayoutBL, cmsForm, ModalBox, CloseButton, cmsList },
   mixins: [ history, snapshot, colors ],
-  computed: {
-    ...mapGetters('CMS', {
-      weblook: 'getWebLook', 
-      system_id: 'getSystemID',
-      init: 'getInitStatus',
-      loading: 'getLoading',
-      panel: 'getPanel',  
-    }),
-  },
-  methods: { 
-    ...mapActions('CMS', ['asyncGetLook', 'asyncGetEffect', 'asyncGetCMSbyId', 'asyncGetID', 'asyncGetImages']), 
-    ...mapMutations('CMS', {
-      addFirstScreen: 'initNewProject', 
-      clearAll: 'clearAll',
-      // panelResize: 'panelResize',
-      setSystemId: 'setSystemId',
-      panelResize: 'panelResize'
-    }),
-  },
+  // computed: {
+  //   ...mapGetters('CMS', {
+  //     // system_id: 'getSystemID',
+  //     // init: 'getInitStatus',
+  //     // loading: 'getLoading',
+  //     // panel: 'getPanel',  
+  //   }),
+  // },
+  // methods: { 
+  //   // ...mapActions('CMS', ['asyncGetImages']), 
+  //   // ...mapMutations('CMS', {
+  //   //   // addFirstScreen: 'initNewProject', 
+  //   //   // clearAll: 'clearAll',
+  //   //   // panelResize: 'panelResize',
+  //   //   // setSystemId: 'setSystemId',
+  //   //   panelResize: 'panelResize'
+  //   // }),
+  // },
 })
 
 export default class CMS extends Vue {
   public config = configCMS;
-  public panel!: any;
+  // public panel!: any;
   private windowWidth: number = window.innerWidth;
   private windowHeight: number = window.innerHeight;
-  private asyncGetLook!: any;
-  private asyncGetEffect!: any;
-  private asyncGetID!: any;
-  private asyncGetCMSbyId!: any;
-  private weblook!: any[];
+  // private asyncGetID!: any;
+  // private asyncGetCMSbyId!: any;
   private screen!: any;
   private block!: any;
-  private system_id!: any;
-  private addFirstScreen!: any;
-  private clearAll!: any;
-  private init!: boolean;
-  private panelResize!: any;
+  // private system_id!: any;
+  // private addFirstScreen!: any;
+  // private clearAll!: any;
+  // private init!: boolean;
+  // private panelResize!: any;
   private clearHistory!: any;
   private saveSnapshot!: any;
-  private setSystemId!: any;
+  // private setSystemId!: any;
   private ModalBox: boolean = false;
+
+  public get init(): boolean { return this.$store.getters['CMS/getInitStatus']; }
+  public get loading(): boolean { return this.$store.getters['CMS/getLoading']; }
+  public get panel(): any { return this.$store.getters['CMS/getPanel']; }
 
   public get systemsList(): any { return this.$store.getters['CMS/getSystemsList']; }
 
+  public getCMSbyId(id: string) {
+    this.$store.dispatch('CMS/asyncGetCMSbyId', {
+      id,
+      callback: this.clearHistory,
+    })
+  }
+
   private get components(): any[] {
     const newArr: any[] = new Array();
-    // console.log(this.weblook);
-    for (const item of this.weblook) {
+    const system_id = this.$store.getters['CMS/getSystemID'];
+    const weblook = this.$store.getters['CMS/getWebLook'];
+    for (const item of weblook) {
       const newItem = {
         params: {
           type: 'CMS',
@@ -156,7 +161,7 @@ export default class CMS extends Vue {
           height: 150,
         },
         props: {
-          systems_id: this.system_id,
+          systems_id: system_id,
           look: item.id,
           effect: '',
         }
@@ -174,36 +179,34 @@ export default class CMS extends Vue {
     return this.windowHeight - 30 //- this.panel.footer;
   }
 
-  private prompt() {
-      const result = prompt('Укажите Systems ID для нового проекта');
-      // валидация!!!
-      result ?
-        this.initialize(result)
-        : alert('не верный ID');
-	}
+  // private prompt() {
+  //     const result = prompt('Укажите Systems ID для нового проекта');
+  //     // валидация!!!
+  //     result ?
+  //       this.initialize(result)
+  //       : alert('не верный ID');
+	// }
 	
 	public upload(): void { this.$store.commit('CMS/saveToService'); }
 	public save(payload: any): void { this.$store.commit('CMS/saveToFile', payload); }
 	public load(payload: any): void { this.$store.commit('CMS/loadFromFile', payload); }
 
-  
-
-  public initialize(e: string) {
-    const init = () => {
-      this.panelResize({dir: 'left', val: 240});
-      this.panelResize({dir: 'right', val: 320});
-      this.setSystemId(e);
-      this.addFirstScreen();
-      this.asyncGetID();
-    }
-    if (!this.init) {
-      init();
-    } else {
-      this.clearAll();
-      init();
-      this.clearHistory();
-    }
-  }
+  // public initialize(e: string) {
+  //   const init = () => {
+  //     this.panelResize({dir: 'left', val: 240});
+  //     this.panelResize({dir: 'right', val: 320});
+  //     // this.setSystemId(e);
+  //     this.addFirstScreen();
+  //     // this.asyncGetID();
+  //   }
+  //   if (!this.init) {
+  //     init();
+  //   } else {
+  //     this.clearAll();
+  //     init();
+  //     this.clearHistory();
+  //   }
+  // }
 
   private mounted(): void {
     const that = this;    
@@ -214,9 +217,10 @@ export default class CMS extends Vue {
   }
 
   private created(): void {
-    this.asyncGetLook();
-    this.asyncGetEffect();
-    // this.asyncGetImages();
+    this.$store.dispatch('CMS/asyncGetLook');
+    this.$store.dispatch('CMS/asyncGetEffect');
+    this.$store.dispatch('CMS/asyncGetWebScreen');
+    this.$store.dispatch('CMS/asyncGetSystemsList');
   }
 }
 </script>

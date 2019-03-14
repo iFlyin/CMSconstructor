@@ -9,6 +9,10 @@ export interface PanelResize {
     val: number;
 }
 
+export interface StringString {
+    [key: string]: string;
+}
+
 export interface KeyValue {
     [key: string]: string;
 }
@@ -168,6 +172,13 @@ export interface SetSize {
 export interface Drag {
     id: number;
     event: DragEventInit;
+}
+
+export interface Effect2creen {
+    id: number;
+    name: string;
+    fullname: string;
+    const_name: string;
 }
 
 

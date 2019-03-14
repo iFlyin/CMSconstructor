@@ -24,7 +24,10 @@ import {
    GetCMSbyID,
    GetCMSlist,
    SetPosition,
+   Effect2creen,
+   StringString
 } from '@/interfaces';
+import axios from './axios';
 // import { weblook, webeffect } from './localhost';
 
 interface State {
@@ -40,14 +43,16 @@ interface State {
    deleteList: number[];
    weblook: WebLook[];
    webeffect: WebEffect[];
-   effect2screen: NumValue;
+   effect2screen: {
+      [key: number]: Effect2creen;
+   };
    look2screen: NumValue;
    prop_type: PropType;
    prop_default: Props;
    images: string[];
 
    // ЗАМЕНИТЬ!!!
-   systems_list: any;
+   systems_list: StringString[];
 }
 
 export default {
@@ -88,21 +93,7 @@ export default {
       deleteList: new Array(),
       weblook: new Array(),
       webeffect: new Array(),
-      effect2screen: {
-         1: 'Экран с плитками',
-         2: 'Экран с фильтрами',
-         3: 'Экран с параметрами',
-         4: 'Экран с задачами',
-         5: 'Экран мастер-деталь',
-         6: 'Экран таблица-мемо',
-         7: 'Экран таблица-поля',
-         8: 'Экран таблица-мемо',
-         10: 'Статичная страница',
-         21: 'Экран дерево-поля ',
-         22: 'Экран поиска документа',
-         24: 'Внутренний фрэйм',
-         27: 'Экран просмотра документа',
-      },
+      effect2screen: new Object(),
       look2screen: {
          12: 'Дерево',
          16: 'Контейнер с ячейками',
@@ -197,63 +188,7 @@ export default {
          gui_icon: null,
       },
       loading: false,
-      images: [
-         'images/Accept.png',
-         'images/actions.png',
-         'images/Add_ico.png',
-         'images/Administrator.png',
-         'images/AIS-client.png',
-         'images/Akt_vyverki.png',
-         'images/Alerts_sprite.png',
-         'images/Apply.png',
-         'images/arrow_down.png',
-         'images/arrow_left.png',
-         'images/arrow_right.png',
-         'images/arrow_up.png',
-         'images/arrow_up1.png',
-         'images/Automate_ico.png',
-         'images/AvtomatMEK.png',
-         'images/Background_clouds.jpg',
-         'images/Background.jpg',
-         'images/button_gradient.png',
-         'images/Calendar.png',
-         'images/Cancel.png',
-         'images/Cancel1.png',
-         'images/Cancel2.png',
-         'images/Cancel3.png',
-         'images/Celevye_MEE-EKMP.png',
-         'images/Checkbox_sprite.png',
-         'images/clear_text.png',
-         'images/Client-action-time.png',
-         'images/Client-action.png',
-         'images/client-AIS-action.png',
-         'images/close.png',
-         'images/close2.png',
-         'images/close3.png',
-         'images/Delete_old.png',
-         'images/delete.png',
-         'images/Disp_vzros.png',
-         'images/Disp.png',
-         'images/divide.png',
-         'images/Documents_stat.png',
-         'images/Documents.png',
-         'images/Documenty.png',
-         'images/DopMEK-MEE-EKMP.png',
-         'images/ESSA_otchet.png',
-         'images/Failovy_obmen.png',
-         'images/favicon.png',
-         'images/favicon2.png',
-         'images/female.png',
-         'images/Filter_All.png',
-         'images/Filter_Gender.png',
-         'images/Filter_Sector.png',
-         'images/Filter_sprite.png',
-         'images/FinKontrol.png',
-         'images/Flag_sprite.png',
-         'images/gender_filter.png',
-         'images/Gender-age_sprite.png',
-         'images/Gosp.png',
-      ],
+      images: new Array(),
    },
    getters: {
       getInitStatus(state: State): boolean { return state.init; },
@@ -382,7 +317,7 @@ export default {
          }
          if (effect !== null) {
             const check: boolean = effect in state.effect2screen;
-            if (check) { newScreen(state.effect2screen[effect]); }
+            if (check) { newScreen(state.effect2screen[effect].name); }
          }
          if (look !== null) {
             const check: boolean = look in state.look2screen;
@@ -555,6 +490,16 @@ export default {
       setSystemId(state: State, payload: string): void {
          state.systems_id = payload;
       },
+      setImages(state: State, payload: string[]) {
+         state.images = payload;
+      },
+      setEffect2screen(state: State, payload: any) {
+         state.effect2screen = payload;
+      },
+      setSystemsList(state: State, payload: StringString[]) {
+         console.log(payload);
+         state.systems_list = payload;
+      },
    },
    actions: {
       asyncGetLook: async (context: any): Promise<any> => {
@@ -617,6 +562,46 @@ export default {
             context.commit('loadFalse');
          } catch (err) {
             // tslint:disable-next-line:no-console
+            console.log(err);
+         }
+      },
+      asyncGetImages: async (context: any, payload: string): Promise<any> => {
+         try {
+            const {data} = await http.get(`getListFiles?dir=${payload}&mask=.%2B\.jpg,.%2B\.png&type=array`);
+            const images = new Array();
+            for (const src of data) {
+               const arr = src.split('\\');
+               arr.splice(0, 3);
+               const str = arr.join('/');
+               images.push(str);
+            }
+            // console.log(data);
+            context.commit('setImages', images);
+         } catch (err) {
+            console.log(err);
+         }
+      },
+      asyncGetWebScreen: async (context: any): Promise<any> => {
+         try {
+            const obj: any = new Object();
+            const {data} = await http.get(`/get/get_web_screen`);
+            // console.log(data);
+            for (const effect of data) {
+               const id: number = effect.id;
+               obj[id] = effect;
+            }
+            context.commit('setEffect2screen', obj);
+         } catch (err) {
+            // tslint:disable-next-line:no-console
+            console.log(err);
+         }
+      },
+      asyncGetSystemsList: async (context: any): Promise<any> => {
+         try {
+            const {data} = await http.get(`get/get_systems`);
+            // console.log(data);
+            context.commit('setSystemsList', data);
+         } catch (err) {
             console.log(err);
          }
       },

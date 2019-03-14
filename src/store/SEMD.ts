@@ -4,7 +4,6 @@ import { Panel, PanelResize, KeyValue } from '@/interfaces';
 
 interface State {
     init: boolean;
-    masterTable: Table;
     semds: SEMD[];
     semd: any;
     panel: Panel;
@@ -25,11 +24,6 @@ export default {
     namespaced: true,
     state: {
         init: false,
-        masterTable: {
-            name: 'Мастер таблица',
-            details: new Array(),
-            table: [],
-        },
         semds: new Array(),
         semd: new Object(),
         panel: {
@@ -45,7 +39,7 @@ export default {
         getSEMD(state: State): any { return state.semd; },
         getPanel(state: State): Panel { return state.panel; },
         getName: (state: State) => (id: string): string => {
-            console.log(id);
+            // console.log(id);
             return state.semds.filter((el: any) => el.id == id)[0].name;
         },
     },
@@ -99,5 +93,17 @@ export default {
                 console.log(err);
             }
         },
+        asyncGetTable: async (context: any, payload: any) => {
+            const schema = payload.schema;
+            const table = payload.table;
+            // console.log(schema);
+            try {
+                const {data} = await http.get(`get/get_constructor_fields?"Имя%20схемы"=tec&"Имя%20таблицы"=clients`);
+                return data;
+            } catch (err) {
+                // tslint:disable-next-line:no-console
+                console.log(err);
+            }
+        } 
     },
 };
