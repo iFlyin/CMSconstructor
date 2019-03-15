@@ -37,7 +37,6 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { mapGetters, mapMutations } from 'vuex';
 import { snapshot} from '@/mixins';
 import ElSelect from '@/components/CMSSelect.vue';
 import GnSelector from '@/components/CMSGnSelector.vue';
@@ -58,44 +57,17 @@ import {
     components: { ElSelect, GnSelector },
     props: { item: { type: Object, required: true, } },
     mixins: [ snapshot ],
-    computed: {
-        ...mapGetters('CMS', {
-            cmsList: 'getCMSlist',
-            screenList: 'getScreenList',
-            zoom: 'getZoom',
-            selected: 'getSelected',
-            lookName: 'getLookName',
-            webEffect: 'getWebEffect',
-            panel: 'getPanel'
-        }),
-    },
-    methods: {
-        ...mapMutations('CMS', {
-            setEffect: 'setCMSeffect',
-            select: 'setSelected',
-            setXY: 'setXY',
-            setValue: 'setValue',
-            setPosition: 'setPosition',
-            setCMSwidth: 'setCMSwidth',
-        }),
-    },
 })
 export default class CMSElement extends Vue {
     public item!: CMS;
-    public zoom!: number;
-    public selected!: number;
-    public panel!: Panel;
-    public cmsList!: CMS[];
-    public screenList!: Screen[];
-    public webEffect!: WebEffect[];
-    public lookName!: string;
-
-    public saveSnapshot!: () => void;
-    public setValue!: (payload: SetValue) => void;
-    public setPosition!: (payload: SetPosition) => void;
-    public setCMSwidth!: (payload: SetCMSwidth) => void;
-    public setEffect!: (payload: SetCMSeffect) => void;
-    public select!: (payload: Selected) => void;
+    
+    public get zoom(): number { return this.$store.getters[`CMS/getZoom`]; };
+    public get selected(): number { return this.$store.getters[`CMS/getSelected`]; };
+    public get panel(): Panel { return this.$store.getters[`CMS/getPanel`] };
+    public get cmsList(): CMS[] { return this.$store.getters[`CMS/getCMSlist`]; };
+    public get screenList(): Screen[] { return this.$store.getters[`CMS/getScreenList`]; };
+    public get webEffect(): WebEffect[] { return this.$store.getters[`CMS/getWebEffect`]; };
+    public get lookName(): string { return this.$store.getters[`CMS/getLookName`]; };
 
     public get layoutCMSstyle(): CmsStyle {
         return {
@@ -108,11 +80,16 @@ export default class CMSElement extends Vue {
             'border-width': 2 / this.zoom + 'px',
         }
     }
-
     public get isSelected(): boolean { return this.item.props.id === this.selected; }
-
     public get groupNumber(): number | null { return this.item.props.group_number; }
-    
+
+    public saveSnapshot!: () => void;
+    public setValue(payload: SetValue): void { this.$store.commit('CMS/setValue', payload); };
+    public setPosition(payload: SetPosition): void { this.$store.commit('CMS/setPosition', payload); };
+    public setCMSwidth(payload: SetCMSwidth): void { this.$store.commit('CMS/setCMSwidth', payload); };
+    public setEffect(payload: SetCMSeffect): void { this.$store.commit('CMS/setCMSeffect', payload); };
+    public select(payload: Selected): void { this.$store.commit('CMS/setSelected', payload); };
+
     public setGroupNumber(v: number) {
         if (v >= 1) {
             this.setValue({
@@ -125,7 +102,7 @@ export default class CMSElement extends Vue {
     }
 
     // добавить тип для элемента HTML или Element 
-    private movement(e: MouseEvent, id: number): void {
+    public movement(e: MouseEvent, id: number): void {
         const that = this;
         const layout: Element = this.$parent.$parent.$el;
         const parent_id: number = this.item.props.parent_id === null
@@ -147,8 +124,8 @@ export default class CMSElement extends Vue {
         const el: any = this.$el;
         const cmsHeight: number = el.offsetHeight;
         
-        const maxX: number = parent.params.width - this.item.params.width - (5 / this.zoom);
-        const maxY: number = (parent.params.height - 60) - cmsHeight - (5 / this.zoom);
+        const maxX: number = parent.params.width - this.item.params.width - (6 / this.zoom);
+        const maxY: number = (parent.params.height - 60) - cmsHeight - (6 / this.zoom);
       
         function move(e: MouseEvent): void {
             let x: number = (e.clientX - offsetX - left) / that.zoom  + scrollX - parentOffsetX;
@@ -176,7 +153,7 @@ export default class CMSElement extends Vue {
         window.addEventListener('mouseup', clean);
     }
 
-    private resize(e: MouseEvent) {
+    public resize(e: MouseEvent) {
         const that: any = this;
         const layout: Element = this.$parent.$el;
         const id: number = this.item.props.id;

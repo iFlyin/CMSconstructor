@@ -32,14 +32,14 @@
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
 import AppTable from '@/components/SEMDTable.vue';
-import { mapGetters } from 'vuex';
+// import { mapGetters } from 'vuex';
 
 @Component({ 
     components: { AppTable },
-    computed: {...mapGetters('SEMD', ['getSEMD'])}
+    // computed: {...mapGetters('SEMD', ['getSEMD'])}
 })
 export default class SEMDStructure extends Vue {
-    public getSEMD!: any;
+    public getSEMD(): any { return this.$store.getters[`SEMD/getSEMD`] };
 }
 </script>
 

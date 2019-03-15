@@ -25,7 +25,6 @@
 
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
-import { mapGetters } from 'vuex';
 
 @Component({
    components: {},
@@ -35,12 +34,11 @@ import { mapGetters } from 'vuex';
          required: true,
       }
    },
-   computed: {...mapGetters('CMS', { weblookName: 'getLookName' })}
 })
 export default class Accordion extends Vue {
-   private activePanel: number = 0;
-
-   private dragStart(e: any, item: any, type: string) {
+   public activePanel: number = 0;
+   public get weblookName(): string { return this.$store.getters[`getLookName`]; };
+   public dragStart(e: any, item: any, type: string) {
       e.dataTransfer.setData(type, JSON.stringify(item));
    }
 }

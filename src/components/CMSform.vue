@@ -15,24 +15,15 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { mapGetters } from 'vuex';
 import AppInput from '@/components/inputs/Label.vue';
 import { CMS, PropType } from '@/interfaces';
-@Component({
-   components: { AppInput },
-   computed: {...mapGetters('CMS', { 
-      params: 'getPropList',
-      checkSelected: 'getSelectedType',
-      selected: 'getSelected',
-      cmsList: 'getCMSlist',
-   })}
-})
+@Component({ components: { AppInput } })
 
 export default class CMSForm extends Vue {
-   private params!: PropType;
-   private selected!: number;
-   private checkSelected!: string;
-   private cmsList!: CMS[];
+   private get params(): PropType { return this.$store.getters[`CMS/getPropList`]; };
+   private get selected(): number { return this.$store.getters[`CMS/getSelected`]; };
+   private get checkSelected(): string { return this.$store.getters[`CMS/getSelectedType`]; };
+   private get cmsList(): CMS[] { return this.$store.getters[`CMS/getCMSlist`]; };
 
    private get CMS(): CMS | object {
       const type: string = this.checkSelected;

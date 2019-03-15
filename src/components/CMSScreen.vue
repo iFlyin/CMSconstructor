@@ -311,7 +311,7 @@ export default class CMSScreen extends Vue {
       item.params.X = posX;
       item.params.Y = posY;
       this.setID(this.id + 1);
-      item.props.id = this.id;
+      item.props.id = `${this.id}gen`;
       item.props.parent_id = (id === -1) ? null : id;
       for (const key in this.addProps) { item.props[key] = this.addProps[key];}
       this.addCMS({

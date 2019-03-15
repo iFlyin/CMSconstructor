@@ -95,7 +95,7 @@ export default {
       webeffect: new Array(),
       effect2screen: new Object(),
       look2screen: {
-         12: 'Дерево',
+         16: 'Дерево',
          17: 'Контейнер с ячейками',
       },
       prop_type: {
