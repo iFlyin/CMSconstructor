@@ -119,23 +119,19 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { mapGetters } from 'vuex';
-@Component({computed: { ...mapGetters('CMS', { zoom: 'getZoom' })}})
-
-export default class SelectResize extends Vue { private zoom!: number; }
+@Component({})
+export default class SelectResize extends Vue {  private get zoom(): number { return this.$store.getters[`CMS/getZoom`]; }; }
 </script>
 
 <style lang="scss" scoped>
-   .resizer {
-      &-grid{
-         position: absolute;
-         box-sizing: border-box;
-         border-style: dashed;
-         border-color: grey;
-         height: 0;
-         outline: none;
-         background: transparent;
-      }
+   .resizer-grid{
+      position: absolute;
+      box-sizing: border-box;
+      border-style: dashed;
+      border-color: grey;
+      height: 0;
+      outline: none;
+      background: transparent;
    }
 
    .layout-item-resizer {

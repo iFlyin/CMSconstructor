@@ -96,7 +96,7 @@ export default {
       effect2screen: new Object(),
       look2screen: {
          12: 'Дерево',
-         16: 'Контейнер с ячейками',
+         17: 'Контейнер с ячейками',
       },
       prop_type: {
          look: {
@@ -286,6 +286,7 @@ export default {
             W: parentPath.params.width,
             H: parentPath.params.height,
          };
+         console.log(payload);
 
          // tslint:disable-next-line:no-shadowed-variable
          const CMS = {
@@ -487,7 +488,6 @@ export default {
          }
          // console.log(state.deleteList);
       },
-      // Поменять
       setID(state: State, payload: number): void {
          state.id = payload;
       },
@@ -508,7 +508,7 @@ export default {
    actions: {
       asyncGetLook: async (context: any): Promise<any> => {
          try {
-            const {data}: GetWebLook = await http.get('get/get_web_look_from_manual?manual=web_look');
+            const {data}: GetWebLook = await http.get('get/get_web_look');
             context.commit('saveWebLook', data);
          } catch (err) {
             // tslint:disable-next-line:no-console
@@ -517,7 +517,7 @@ export default {
       },
       asyncGetEffect: async (context: any): Promise<any> => {
          try {
-            const {data}: GetWebEffect = await http.get('get/get_web_effect_from_manual?manual=web_effect');
+            const {data}: GetWebEffect = await http.get('get/get_web_effect');
             context.commit('saveWebEffect', data);
          } catch (err) {
             // tslint:disable-next-line:no-console
@@ -582,6 +582,7 @@ export default {
             // console.log(data);
             context.commit('setImages', images);
          } catch (err) {
+            // tslint:disable-next-line:no-console
             console.log(err);
          }
       },

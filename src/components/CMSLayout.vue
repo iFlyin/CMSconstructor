@@ -25,7 +25,6 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { mapMutations, mapGetters } from 'vuex';
 import CmsScreen from '@/components/CMSScreen.vue';
 import { snapshot } from '@/mixins';
 import { Screen, CMS, Panel, Selected, SetZoom } from '@/interfaces';
@@ -34,44 +33,25 @@ import { Screen, CMS, Panel, Selected, SetZoom } from '@/interfaces';
     mixins: [ snapshot ],
     components: { CmsScreen },
     props: { left: { type: Number, required: true } },
-    computed: {
-        ...mapGetters('CMS', {
-            zoom: 'getZoom',
-            screenList: 'getScreenList',
-            cmsList: 'getCMSlist',
-            selected: 'getSelected',
-            selectedType: 'getSelectedType',
-            panel: 'getPanel'
-        }),
-    },
-    methods: {
-        ...mapMutations('CMS', {
-            add2screenList: 'add2screenList',
-            deleteScreen: 'delFromScreenList',
-            deleteCMS: 'deleteCMS',   
-            clearEffect: 'clearCMSeffect',         
-            select: 'setSelected',
-            setZoom: 'setZoom',
-        }),
-    },
 })
 
 export default class CMSLayout extends Vue {
-    public screenList!: Screen[];
-    public cmsList!: CMS[];
     public left!: number;
-    public selected!: number;
-    public selectedType!: string;
-    public zoom!: number;
-    public panel!: Panel;
 
-    public saveSnapshot!: () => void;
-    public add2screenList!: (payload: Screen) => void;
-    public deleteScreen!: (payload: number) => void;
-    public clearEffect!: (payload: number) => void;
-    public deleteCMS!: (payload: number) => void;
-    public select!: (payload: Selected) => void;
-    public setZoom!: (payload: SetZoom) => void;
+    public get zoom(): number { return this.$store.getters[`CMS/getZoom`]; }
+    public get panel(): Panel { return this.$store.getters[`CMS/getPanel`]; }
+    public get selected(): number { return this.$store.getters[`CMS/getSelected`]; }
+    public get selectedType(): string { return this.$store.getters[`CMS/getSelectedType`]; }
+    public get screenList(): Screen[] { return this.$store.getters[`CMS/getScreenList`]; }
+    public get cmsList(): CMS[] { return this.$store.getters[`CMS/getCMSlist`]; }
+
+    public saveSnapshot!:() => void;
+    public add2screenList(payload: Screen): void { this.$store.commit('CMS/add2screenList', payload); }
+    public deleteScreen(payload: number): void { this.$store.commit(`CMS/delFromScreenList`, payload); }
+    public clearEffect(payload: number) : void { this.$store.commit(`CMS/clearCMSeffect`, payload); }
+    public deleteCMS(payload: number): void { this.$store.commit(`CMS/deleteCMS`, payload); }
+    public select(payload: Selected): void { this.$store.commit(`CMS/setSelected`, payload) }
+    public setZoom(payload: SetZoom) :void { this.$store.commit(`CMS/setZoom`, payload); }
 
     public del(): void {
         const selected = this.selected;
@@ -164,30 +144,30 @@ export default class CMSLayout extends Vue {
         window.addEventListener('mouseup', clean);
     }
 
-    private keyUpListner(e: KeyboardEvent): void {if(e.code === 'Delete'){this.del()} }
+    public keyUpListner(e: KeyboardEvent): void { if(e.code === 'Delete') { this.del(); } }
 
-    private mounted(): void { document.addEventListener('keyup', this.keyUpListner) }
-    private beforeDestroy(): void { document.removeEventListener('keyup', this.keyUpListner) }
+    public mounted(): void { document.addEventListener('keyup', this.keyUpListner) }
+    public beforeDestroy(): void { document.removeEventListener('keyup', this.keyUpListner) }
 }
 </script>
 
 
 <style lang="scss" scoped>
-   .layout {
+    .layout {
+        position: relative;
+        display: flex;
         min-width: 100%;
         min-height: 100%;
-        display: flex;
         z-index: 1;
-        position: relative;
         outline: none;
         overflow: auto;
     }
 
    .line-container {
-      top: 0;
-      left: 0;
-      position: absolute;
-      width: 100%;
-      height: 100%;
-   }
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+    }
 </style>

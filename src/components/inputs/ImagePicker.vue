@@ -12,7 +12,7 @@
                     type="button" 
                     :disabled="(val === '')" 
                     value="Выбрать" 
-                    @click="ModalBox = true, getSize()"
+                    @click="ModalBox = true"
                     :style="{
                         cursor: (val === '') ? 'not-allowed' : 'pointer',
                     }"
@@ -27,13 +27,13 @@
                 </div>
             </template>
             <div class="image-list">
-                <div class="image-item" @click="selected = -1" :class="{'image-item-selected': -1 === selected}">
+                <!-- <div class="image-item" @click="selected = -1" :class="{'image-item-selected': -1 === selected}">
                     <div class="image-item-img">
                         <img :src="empty" :alt="'Не задан'">
                     </div>
                     <span class="image-item-name">Не задан</span>
                     <div class="image-item-size">0 х 0</div>
-                </div>
+                </div> -->
                 <div class="image-item" v-for="(img, index) of cards" :key="index" @click="selected = index" :class="{'image-item-selected': index === selected}">
                     <div class="image-item-img">
                         <img :src="img.src" :alt="img.name">
@@ -77,9 +77,7 @@ export default class ImagePicker extends Vue {
     public cards: Card[] = new Array();
     public selected: number = this.value;
 
-    public get value(): number {
-        return this.cards.findIndex((el: any) => el.name === this.val);
-    }
+    public get value(): number { return this.cards.findIndex((el: any) => el.name === this.val); }
 
     public async getSize(index: number) {
         let img: any = new Image();
@@ -93,13 +91,6 @@ export default class ImagePicker extends Vue {
         return await load;
     }
 
-    // public getName(index: number): string {
-    //     const images = this.$store.getters['CMS/getImages'];
-    //     // const arr = this.images[index].split('/');
-    //     const name = images[index][images[index].length - 1];
-    //     return name;
-    // }
-
     public async created(): Promise<any> {
         await this.$store.dispatch('CMS/asyncGetImages', 'D:\\svn\\images');
         const images = this.$store.getters['CMS/getImages'];
@@ -109,7 +100,6 @@ export default class ImagePicker extends Vue {
                 (async () => {
                     const img = images[i];
                     const size: string = await this.getSize(i);
-                    // const name = this.getName(i);
                     this.cards.push({
                         src: src + img,
                         size: size,
@@ -118,9 +108,6 @@ export default class ImagePicker extends Vue {
                 })();
             }
         }
-        // console.log (this.cards);
-        
-        // console.log(this.cards)
     }
 
     public get getSelected(): number {
@@ -142,11 +129,9 @@ export default class ImagePicker extends Vue {
 
     public get empty(): string {
         return require(`@/assets/not_found.jpg`);
-        // return 'd:/svn/images/accept.png'
     }
 
     public select() {
-        console.log(this.selected);
         if (this.selected === -1) {
             this.$emit('change', null);
         } else if (this.selected >= 0) {
@@ -222,9 +207,6 @@ export default class ImagePicker extends Vue {
             padding: 5px;
             box-sizing: border-box;
             border: 2px solid #fff;
-            // line-height: 23px;
-            // vertical-align: 15px;
-
         }
         
         &-size {
@@ -341,7 +323,6 @@ export default class ImagePicker extends Vue {
                 width: 98px;
                 height: 98px;
                 padding: 2px;
-                // background-color: #fff;
                 background-image:
                     linear-gradient(45deg, rgba(20, 20, 20, 0.1) 25%, transparent 25%),
                     linear-gradient(45deg, transparent 75%, rgba(20, 20, 20, 0.1) 75%),

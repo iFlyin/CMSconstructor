@@ -13,6 +13,8 @@
             :style="{
                top: this.top + 'px',
                left: this.left + 'px',
+               fontSize: 12 / zoom + 'px',
+               maxHeight: 200 / zoom + 'px'
             }"
          >
             <div class="option-item" value="" @click="select('')">Нет</div>
@@ -24,7 +26,6 @@
                :class="{'active-item': selected === option.id}"
             >
                {{(option[name] &lt; 0) ? -(option[name]) : option.name}}
-               <!-- {{option}} -->
             </div>
          </div>
       </template>
@@ -33,7 +34,6 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { mapGetters } from 'vuex';
 
 interface options {
    [option: string]: option;
@@ -51,16 +51,9 @@ interface option {
          default: [],
       },
       selected: { required: true },
-      label: {
-         type: String,
-         default: ''
-      },
-      name: {
-         type: [String, Number],
-         required: true,
-      }
+      label: { type: String, default: '' },
+      name: { type: [String, Number], required: true }
    }, 
-   computed: {...mapGetters('CMS', {zoom: 'getZoom'})},
 })
 export default class ElSelect extends Vue{
    private show: boolean = false;
@@ -68,7 +61,8 @@ export default class ElSelect extends Vue{
    private options!: options;
    private top: number = 0;
    private left: number = 0;
-   private zoom!: number;
+
+   public get zoom(): number { return this.$store.getters[`CMS/getZoom`]}
 
    private select(v: number): void {
       this.show = false;
@@ -87,7 +81,7 @@ export default class ElSelect extends Vue{
       const scrollLeft: any = canvas.$el.scrollLeft;
       const scrollTop: any = canvas.$el.scrollTop;
       this.top = el.offsetTop + parent.offsetTop + el.offsetHeight + 44 + (30 / this.zoom) - scrollTop;
-      this.left = el.offsetLeft + parent.offsetLeft + 4 +(canvas.left / this.zoom) - scrollLeft;
+      this.left = el.offsetLeft + parent.offsetLeft + 4 + (canvas.left / this.zoom) - scrollLeft;
    }
 
    private get selectedEffect(this: any): string {
@@ -139,7 +133,6 @@ export default class ElSelect extends Vue{
    }
 
    .option-list {
-      // margin-top: 160px;
       user-select: none;
       position: fixed;
       top: 0;

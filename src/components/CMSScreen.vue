@@ -2,18 +2,7 @@
    <div class="svg-wrapper">
       <div 
          class="layout-item"
-         :style="{
-            'z-index': (childSelected) 
-                ? '1000000' : isSelected 
-                    ? '1111' : '',
-            left: item.params.X + 'px',
-            top: item.params.Y + 'px',
-            width: item.params.width + 'px',
-            height: item.params.height + 'px',
-            'border-width': 2 / zoom + 'px',
-            'border-color': colorGrey,
-            'border-style': 'solid'
-         }"
+         :style="style"
          @click.stop.prevent="select({ id: item.props.id, type: 'Screen' })"
       >
          <div class="layout-item-wrapper">
@@ -22,22 +11,21 @@
                <div class="layout-item-header" @drop.stop @mousedown.stop="movement($event)" :style="{
                   background: isSelected ? colorGreen : colorGrey
                }">
-                  <!-- вынести в getter!!! -->
-                  {{ (item.props.id &lt; 0) ? -(item.props.id) : '' }} {{item.props.name || 'Пустой экран'}}
+                  {{(item.props.id > 0) ? `${item.props.id} ${item.props.name}` : `${item.props.name}`}}
                </div>   
                <div 
-                   class="layout-item-canvas"
-                   @mousedown.stop.prevent
-                   @dragover.stop.prevent
-                   @drop.stop="drop({
-                       event: $event,
-                       id: item.props.id,
-                   })"
+                  class="layout-item-canvas"
+                  @mousedown.stop.prevent
+                  @dragover.stop.prevent
+                  @drop.stop="drop({
+                     event: $event,
+                     id: item.props.id,
+                  })"
                >  
                   <cms-element 
-                      v-for="(component, id) of childsList" 
-                      :key="id" :item="component"
-                      :data-id="component.props.id"
+                     v-for="(component, id) of childsList" 
+                     :key="id" :item="component"
+                     :data-id="component.props.id"
                   />
                </div>
             </div>  
@@ -75,7 +63,6 @@
 
 <script lang="ts">
 import { Vue, Component } from 'vue-property-decorator';
-import { mapGetters, mapMutations } from 'vuex';
 import { snapshot, colors } from '@/mixins';
 import CmsElement from './CMSElement.vue';
 import intersect from 'path-intersection';
@@ -83,52 +70,45 @@ import ScreenResize from './CMSResize.vue';
 import { Screen, CMS, Panel, AddCMS, Props, SetSize, Drag } from '@/interfaces';
 
 @Component({
-    components: {CmsElement, ScreenResize},
-    props: { item: { type: Object, required: true } },
-    mixins: [ snapshot, colors ],
-    computed: {
-         ...mapGetters('CMS', {
-            id: 'getID',
-            cmsList: 'getCMSlist',
-            zoom: 'getZoom',
-            screenList: 'getScreenList',
-            selected: 'getSelected',
-            addProps: 'getProp',
-            panel: 'getPanel'
-        }),
-    },
-    methods: {
-        ...mapMutations('CMS', {
-            setID: 'setID',
-            addCMS: 'add2cmsList',
-            select: 'setSelected',
-        })
-    }
+   components: {CmsElement, ScreenResize},
+   props: { item: { type: Object, required: true } },
+   mixins: [ snapshot, colors ],
 })
 export default class CMSScreen extends Vue {
-   public id!: number;
    public item!: Screen;
-   public screenList!: Screen[];
-   public cmsList!: CMS[];
-   public zoom!: number;
-   public selected!: number;
-   public panel!: Panel;
-   public addProps!: Props;
-   
-   public saveSnapshot!: () => void;
-   public setID!: (payload: number) => void;
-   public addCMS!: (payload: AddCMS) => void;
-   
-   private get X(): number { return this.item.params.X; }
-   private get Y(): number { return this.item.params.Y; }
-   private get width(): number { return this.item.params.width; }
-   private get height(): number { return this.item.params.height; }
-   private get centerX(): number { return this.width / 2; }
-   private get centerY(): number { return this.height / 2; }
-   private get path(): string { return this.rectConstructor(this.X, this.Y, this.width, this.height); }
+   public colorGrey!: string
 
+   public get zoom(): number { return this.$store.getters[`CMS/getZoom`]; }
+   public get selected(): number { return this.$store.getters[`CMS/getSelected`]; }
+   public get panel(): Panel { return this.$store.getters[`CMS/getPanel`]; }
+   public get addProps(): Props { return this.$store.getters[`CMS/getProp`]; }
+   public get id(): number { return this.$store.getters[`CMS/getID`]; }
+   public get screenList(): Screen[] { return this.$store.getters[`CMS/getScreenList`]; }
+   public get cmsList(): CMS[] { return this.$store.getters[`CMS/getCMSlist`]; }
+   public get X(): number { return this.item.params.X; }
+   public get Y(): number { return this.item.params.Y; }
+   public get width(): number { return this.item.params.width; }
+   public get height(): number { return this.item.params.height; }
+   public get centerX(): number { return this.width/2; }
+   public get centerY(): number { return this.height/2; }
+   public get path(): string { return this.rectConstructor(this.X, this.Y, this.width, this.height); }
    public get isSelected(): boolean { return this.item.props.id === this.selected; }
 
+   public get style(): any {
+      return {
+         'z-index': (this.childSelected)
+                ? '1000000' : this.isSelected 
+                    ? '1111' : '',
+         left: this.item.params.X + 'px',
+         top: this.item.params.Y + 'px',
+         width: this.item.params.width + 'px',
+         height: this.item.params.height + 'px',
+         'border-width': 2 / this.zoom + 'px',
+         'border-color': this.colorGrey,
+         'border-style': 'solid',
+      }
+   }
+   
    public get childsList(): CMS[] {
       const id: number = this.item.props.id;
       const fixId: number | null = (id === - 1) ? null : id;
@@ -192,6 +172,11 @@ export default class CMSScreen extends Vue {
       }
       return lines;
    }
+   
+   public saveSnapshot!: () => void;
+   public select(payload: any): void { this.$store.commit(`CMS/setSelected`, payload); }
+   public setID(payload: number): void { this.$store.commit(`CMS/setID`, payload); }
+   public addCMS(payload: AddCMS): void { this.$store.commit(`CMS/add2cmsList`, payload); }
 
    public resize(payload: SetSize): void {
       const that = this;
@@ -323,36 +308,36 @@ export default class CMSScreen extends Vue {
 
 <style lang="scss" scoped>
    .layout-item {
+      box-sizing: border-box;
+      position: absolute;
+      z-index: 1001;
       border-style: solid;
       border-color: $colorGrey;
-      box-sizing: border-box;
-      z-index: 1001;
-      position: absolute;
 
       &-wrapper {
+         position: relative;
          width: 100%;
          height: 100%;
-         position: relative;
       }
       
       &-content {
          position: absolute;
+         flex-flow: column nowrap;
+         display: flex;
          top: 0;
          left: 0;
          height: 100%;
          width: 100%;
-         display: flex;
-         flex-flow: column nowrap;
       }
 
       &-header {
-         min-height: 40px;
-         padding: 10px;
-         width: 100%;
          box-sizing: border-box;
          display: flex;
          justify-content: center;
          align-items: center;
+         width: 100%;
+         min-height: 40px;
+         padding: 10px;      
          user-select: none;
          cursor: move;
          background-color: $colorGrey;
@@ -360,9 +345,9 @@ export default class CMSScreen extends Vue {
       }
 
       &-canvas {
+         position: relative;
          flex: 1 1 auto;
          overflow: auto;
-         position: relative;
       }
    }
 
