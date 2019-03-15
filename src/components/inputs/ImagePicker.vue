@@ -27,13 +27,13 @@
                 </div>
             </template>
             <div class="image-list">
-                <!-- <div class="image-item" @click="selected = -1" :class="{'image-item-selected': -1 === selected}">
+                <div class="image-item" @click="selected = -1" :class="{'image-item-selected': -1 === selected}">
                     <div class="image-item-img">
                         <img :src="empty" :alt="'Не задан'">
                     </div>
                     <span class="image-item-name">Не задан</span>
                     <div class="image-item-size">0 х 0</div>
-                </div> -->
+                </div>
                 <div class="image-item" v-for="(img, index) of cards" :key="index" @click="selected = index" :class="{'image-item-selected': index === selected}">
                     <div class="image-item-img">
                         <img :src="img.src" :alt="img.name">

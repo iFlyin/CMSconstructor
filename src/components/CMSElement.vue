@@ -135,7 +135,7 @@ export default class CMSElement extends Vue {
         const parentIndex: number = this.screenList.findIndex((el: Screen) => el.props.id === parent_id);
         const parent: Screen = this.screenList[parentIndex];
         const parentOffsetX: number = parent.params.X;
-        const parentOffsetY: number = parent.params.Y + 40;
+        const parentOffsetY: number = parent.params.Y + 60;
         const scrollX: number = layout.scrollLeft;
         const scrollY: number = layout.scrollTop;
         const offsetX: number = e.offsetX;
@@ -147,8 +147,8 @@ export default class CMSElement extends Vue {
         const el: any = this.$el;
         const cmsHeight: number = el.offsetHeight;
         
-        const maxX: number = parent.params.width - this.item.params.width - (4 / this.zoom);
-        const maxY: number = (parent.params.height - 40) - cmsHeight - (5 / this.zoom);
+        const maxX: number = parent.params.width - this.item.params.width - (5 / this.zoom);
+        const maxY: number = (parent.params.height - 60) - cmsHeight - (5 / this.zoom);
       
         function move(e: MouseEvent): void {
             let x: number = (e.clientX - offsetX - left) / that.zoom  + scrollX - parentOffsetX;

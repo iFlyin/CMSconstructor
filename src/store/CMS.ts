@@ -286,7 +286,7 @@ export default {
             W: parentPath.params.width,
             H: parentPath.params.height,
          };
-         console.log(payload);
+         // console.log(payload);
 
          // tslint:disable-next-line:no-shadowed-variable
          const CMS = {

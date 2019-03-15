@@ -95,18 +95,37 @@ export default class CMSScreen extends Vue {
    public get isSelected(): boolean { return this.item.props.id === this.selected; }
 
    public get style(): any {
+      const height: number = this.item.params.height;
+      let minHeight!: number;
+      this.$nextTick(function(){
+         minHeight = this.minHeight;
+      })
+
       return {
-         'z-index': (this.childSelected)
+            'z-index': (this.childSelected)
                 ? '1000000' : this.isSelected 
                     ? '1111' : '',
-         left: this.item.params.X + 'px',
-         top: this.item.params.Y + 'px',
-         width: this.item.params.width + 'px',
-         height: this.item.params.height + 'px',
-         'border-width': 2 / this.zoom + 'px',
-         'border-color': this.colorGrey,
-         'border-style': 'solid',
+            left: this.item.params.X + 'px',
+            top: this.item.params.Y + 'px',
+            width: this.item.params.width + 'px',
+            height: minHeight > height ? `${minHeight}px`: `${height}px`,
+            'border-width': 2 / this.zoom + 'px',
+            'border-color': this.colorGrey,
+            'border-style': 'solid',
       }
+      // const minHeight = this.minHeight;
+      // return {
+      //    'z-index': (this.childSelected)
+      //           ? '1000000' : this.isSelected 
+      //               ? '1111' : '',
+      //    left: this.item.params.X + 'px',
+      //    top: this.item.params.Y + 'px',
+      //    width: this.item.params.width + 'px',
+      //    height: `${height}px`,
+      //    'border-width': 2 / this.zoom + 'px',
+      //    'border-color': this.colorGrey,
+      //    'border-style': 'solid',
+      // }
    }
    
    public get childsList(): CMS[] {
@@ -117,9 +136,13 @@ export default class CMSScreen extends Vue {
 
    public get minWidth(): number {
       let minWidth: number = 300;
-      for (const child of this.childsList) {
-         const childMaxX: number = child.params.X + child.params.width + (6 * this.zoom);
-         if (childMaxX > minWidth) { minWidth = childMaxX; }
+      if(this.childsList.length > 0) {
+         for (const child of this.childsList) {
+            const el: HTMLElement | null = this.$el.querySelector(`div[data-id="${child.props.id}"]`);
+            if (el) { const childMaxX: number = child.params.X + child.params.width + (6 / this.zoom); 
+               if (childMaxX > minWidth) { minWidth = childMaxX; }
+            }
+         }
       }
       return minWidth;
    }
@@ -129,7 +152,10 @@ export default class CMSScreen extends Vue {
       if (this.childsList.length > 0) {
          for (const child of this.childsList) {
             const el: HTMLElement | null = this.$el.querySelector(`div[data-id="${child.props.id}"]`);
-               if (el) { const childMaxY = child.params.Y + el.offsetHeight + 40 + (8 / this.zoom);
+            if (el) { 
+               // const header: HTMLElement | null = this.$el.querySelector(`.layout-item-header`);
+               // const height: number = header ? header.offsetHeight : 0;
+               const childMaxY = child.params.Y + el.offsetHeight + 60 + (8 / this.zoom);
                if (childMaxY > minHeight) { minHeight = childMaxY; }
             }
          }
@@ -303,6 +329,24 @@ export default class CMSScreen extends Vue {
    public lineConstructor(x1: number, y1: number, x2: number, y2: number): string {
       return `M${x1},${y1}L${x2},${y2}`
    }
+
+   public mounted(): void {
+      if(this.minHeight > this.item.params.height) {
+         this.item.params.height = this.minHeight;
+      }
+      if(this.minWidth > this.item.params.width) {
+         this.item.params.width = this.minWidth
+      }
+   }
+
+   public beforeUpdate(): void {
+      if(this.minHeight > this.item.params.height) {
+         this.item.params.height = this.minHeight;
+      }
+      if(this.minWidth > this.item.params.width) {
+         this.item.params.width = this.minWidth
+      }
+   }
 }
 </script>
 
@@ -313,6 +357,7 @@ export default class CMSScreen extends Vue {
       z-index: 1001;
       border-style: solid;
       border-color: $colorGrey;
+      // overflow: hidden;
 
       &-wrapper {
          position: relative;
@@ -336,7 +381,7 @@ export default class CMSScreen extends Vue {
          justify-content: center;
          align-items: center;
          width: 100%;
-         min-height: 40px;
+         min-height: 60px;
          padding: 10px;      
          user-select: none;
          cursor: move;
